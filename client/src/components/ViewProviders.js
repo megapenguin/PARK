@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import noimageicon from "./assets/noimageicon.jpg";
 import parklogo from "./assets/parklogo.png";
+import Sidebar from "./layouts/Sidebar";
 import {
   Table,
   Card,
@@ -36,6 +37,8 @@ function ViewProviders() {
   let [vehicleCapacity, setVehicleCapacity] = useState("");
   let [parkingPrice, setParkingPrice] = useState("");
   let [searchUser, setSearchUser] = useState("");
+  let [refreshInfo, setRefreshInfo] = useState(false);
+  let [refreshTable, setRefreshTable] = useState(false);
 
   useEffect(() => {
     Axios.get("http://localhost:8000/api/providers/getverifiedproviders")
@@ -48,10 +51,11 @@ function ViewProviders() {
       })
       .catch((error) => console.log(error));
     console.log("what happend?");
-  }, []);
+  }, [refreshTable]);
 
   const handleOnSelect = (index) => {
     console.log(index);
+    setRefreshTable(false);
 
     Axios.post("http://localhost:8000/api/users/userprofilepicture", {
       id: searchResult[index].userId,
@@ -69,7 +73,6 @@ function ViewProviders() {
     setVehicleCapacity(searchResult[index].totalSlots);
     setVehicleType(searchResult[index].vehicleType);
     setParkingPrice(searchResult[index].parkingPrice);
-
     setProviderId(searchResult[index].id);
     setUserId(searchResult[index].userId);
     setFirstName(searchResult[index].firstName);
@@ -79,6 +82,8 @@ function ViewProviders() {
     setParkingLotLocation(searchResult[index].parkingLotLocation);
     setPersonalAddress(searchResult[index].personalAddress);
     console.log(parkingLotLocation);
+    setRefreshInfo(true);
+    setRefreshTable(false);
   };
 
   const enterSearch = (e) => {
@@ -88,6 +93,7 @@ function ViewProviders() {
   };
   const handleOnChange = (e) => {
     e.preventDefault();
+
     if (e.currentTarget.name === "vehicletype") {
       setVehicleType(e.currentTarget.value);
       console.log(vehicleType);
@@ -122,6 +128,7 @@ function ViewProviders() {
 
   const handleOnSearch = (e) => {
     e.preventDefault();
+
     Axios.post("http://localhost:8000/api/providers/searchproviders", {
       providerId: searchUser,
       firstName: searchUser,
@@ -140,7 +147,8 @@ function ViewProviders() {
 
   const handleToApprove = (e) => {
     e.preventDefault();
-
+    setRefreshInfo(false);
+    setRefreshTable(true);
     Axios.post("http://localhost:8000/api/providers/updateprovider", {
       id: providerId,
       firstName: firstName,
@@ -152,17 +160,50 @@ function ViewProviders() {
       parkingLotStatus: parkingLotStatus,
     }).then((_res) => {
       console.log(_res);
+      setRefreshTable(true);
     });
+
+    Axios.get("http://localhost:8000/api/providers/getverifiedproviders")
+      .then((_res) => {
+        console.log(_res);
+        let data = _res.data;
+        searchResult = data;
+        setSearchResult(searchResult);
+        console.log(searchResult);
+        setRefreshTable(true);
+      })
+      .catch((error) => console.log(error));
+    console.log("what happend?");
+    setRefreshTable(true);
+  };
+
+  const handleToEnter = (e) => {
+    if (e.key === "Enter") {
+      Axios.post("http://localhost:8000/api/providers/searchproviders", {
+        providerId: searchUser,
+        firstName: searchUser,
+        lastName: searchUser,
+      }).then((_res) => {
+        console.log(_res);
+        let data = _res.data;
+        searchResult = data;
+        setSearchResult(searchResult);
+        console.log("success");
+        console.log(searchResult);
+      });
+    }
   };
 
   return (
     <React.Fragment>
+      <Sidebar />
       <Row>
         <Col className="mb-5">
           <NavBar />
         </Col>
       </Row>
-      <Container className="mt-5">
+
+      <Container className="mt-5 mr-5">
         <Row className="mt-5">
           <Col sm="12" md={{ size: 6, offset: 3 }}>
             <h1 className="mt-6 shadow mt-5" style={{ borderRadius: 50 }}>
@@ -184,6 +225,7 @@ function ViewProviders() {
                       borderBottomLeftRadius: 50,
                     }}
                     onChange={enterSearch}
+                    onKeyPress={handleToEnter}
                     placeholder="Search Providers"
                   />
                   <InputGroupAddon addonType="append">
@@ -202,16 +244,18 @@ function ViewProviders() {
                   className="mt-3"
                   style={{
                     textAlign: "center",
-                    width: 525,
+
                     border: "hidden",
                   }}
                 >
-                  <tr>
-                    <th>ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th> Status</th>
-                  </tr>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                      <th> Status</th>
+                    </tr>
+                  </thead>
                 </Table>
                 <Table hover responsive>
                   <tbody>
@@ -236,7 +280,7 @@ function ViewProviders() {
                 <CardTitle>
                   <img
                     id="garagepicture"
-                    src={parkingLotPicture ? parkingLotPicture : noimageicon}
+                    src={refreshInfo === true ? parkingLotPicture : noimageicon}
                     style={{
                       height: 200,
                       width: 250,
@@ -245,7 +289,9 @@ function ViewProviders() {
                   ></img>{" "}
                 </CardTitle>
                 <Label for="garagepicture">
-                  <h5>{parkingLotName ? parkingLotName : "Parkinglot Name"}</h5>
+                  <h5>
+                    {refreshInfo === true ? parkingLotName : "Parkinglot Name"}
+                  </h5>
                 </Label>
                 <CardBody>
                   <Form>
@@ -259,14 +305,16 @@ function ViewProviders() {
                           id="vehicletype"
                           onChange={handleOnChange}
                           style={{ textAlign: "center", borderRadius: 10 }}
-                          placeholder={
-                            vehicleType ? vehicleType : "Vehicle Type"
+                          value={
+                            refreshInfo === true ? vehicleType : "Vehicle Type"
                           }
                         />
                       </Col>
                     </FormGroup>
                     <FormGroup row>
-                      <Label for="vehiclecapacity">Vehicle Capacity :</Label>
+                      <Col>
+                        <Label for="vehiclecapacity">Vehicle Capacity :</Label>
+                      </Col>
                       <Col sm={8}>
                         <Input
                           type="text"
@@ -274,8 +322,8 @@ function ViewProviders() {
                           id="vehiclecapacity"
                           onChange={handleOnChange}
                           style={{ textAlign: "center", borderRadius: 10 }}
-                          placeholder={
-                            vehicleCapacity
+                          value={
+                            refreshInfo === true
                               ? vehicleCapacity
                               : "Vehicle Capacity"
                           }
@@ -283,7 +331,12 @@ function ViewProviders() {
                       </Col>
                     </FormGroup>
                     <FormGroup row>
-                      <Label for="parkingprice">Parking Price :</Label>
+                      <Col>
+                        {" "}
+                        <Label for="parkingprice">
+                          Parking Price per Hour:
+                        </Label>
+                      </Col>
                       <Col sm={8}>
                         <Input
                           type="text"
@@ -291,9 +344,9 @@ function ViewProviders() {
                           id="parkingprice"
                           onChange={handleOnChange}
                           style={{ textAlign: "center", borderRadius: 10 }}
-                          placeholder={
-                            parkingPrice
-                              ? `${parkingPrice}/Hour`
+                          value={
+                            refreshInfo === true
+                              ? parkingPrice
                               : "Parking Price"
                           }
                         />
@@ -308,12 +361,12 @@ function ViewProviders() {
       </Container>
       <Row>
         <Container>
-          <h2 className="mt-5">Provider Information</h2>
+          <h2 className="mt-2">Provider Information</h2>
           <Card style={{ border: "hidden" }}>
-            <CardTitle className="mt-5">
+            <CardTitle className="mt-2">
               <img
                 id="profilepicture"
-                src={profilePicture ? profilePicture : noimageicon}
+                src={refreshInfo === true ? profilePicture : noimageicon}
                 style={{
                   height: 150,
                   width: 150,
@@ -327,7 +380,11 @@ function ViewProviders() {
                   <Col md={6}>
                     <FormGroup>
                       <Label>
-                        <h5>{userId ? `User ID : ${userId}` : "User ID"}</h5>
+                        <h5>
+                          {refreshInfo === true
+                            ? `User ID : ${userId}`
+                            : "User ID"}
+                        </h5>
                       </Label>
                     </FormGroup>
                   </Col>
@@ -336,7 +393,7 @@ function ViewProviders() {
                       <Label>
                         <h5>
                           {" "}
-                          {providerId
+                          {refreshInfo === true
                             ? `Provider Id : ${providerId}`
                             : "Provider ID"}
                         </h5>
@@ -352,7 +409,7 @@ function ViewProviders() {
                         id="firstname"
                         onChange={handleOnChange}
                         style={{ textAlign: "center", borderRadius: 10 }}
-                        placeholder={firstName ? firstName : "Firstname"}
+                        value={refreshInfo === true ? firstName : "Firstname"}
                       />
                     </FormGroup>
                   </Col>
@@ -365,7 +422,7 @@ function ViewProviders() {
                         id="lastname"
                         onChange={handleOnChange}
                         style={{ textAlign: "center", borderRadius: 10 }}
-                        placeholder={lastName ? lastName : "Lastname"}
+                        value={refreshInfo === true ? lastName : "Lastname"}
                       />
                     </FormGroup>
                   </Col>
@@ -378,8 +435,8 @@ function ViewProviders() {
                         id="contactnumber"
                         onChange={handleOnChange}
                         style={{ textAlign: "center", borderRadius: 10 }}
-                        placeholder={
-                          contactNumber ? contactNumber : "Contactnumber"
+                        value={
+                          refreshInfo === true ? contactNumber : "Contactnumber"
                         }
                       />
                     </FormGroup>
@@ -393,8 +450,8 @@ function ViewProviders() {
                         id="parkinglotstatus"
                         onChange={handleOnChange}
                         style={{ textAlign: "center", borderRadius: 10 }}
-                        placeholder={
-                          parkingLotStatus
+                        value={
+                          refreshInfo === true
                             ? parkingLotStatus
                             : "Parkinglot Status"
                         }
@@ -410,8 +467,8 @@ function ViewProviders() {
                         id="parkinglotaddress"
                         onChange={handleOnChange}
                         style={{ textAlign: "center", borderRadius: 10 }}
-                        placeholder={
-                          parkingLotLocation
+                        value={
+                          refreshInfo === true
                             ? parkingLotLocation
                             : "Parkinglot Address"
                         }
@@ -429,8 +486,10 @@ function ViewProviders() {
                         id="personaladdress"
                         onChange={handleOnChange}
                         style={{ textAlign: "center", borderRadius: 10 }}
-                        placeholder={
-                          personalAddress ? personalAddress : "Personal Address"
+                        value={
+                          refreshInfo === true
+                            ? personalAddress
+                            : "Personal Address"
                         }
                       />
                     </FormGroup>

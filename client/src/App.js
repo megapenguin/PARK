@@ -11,6 +11,8 @@ import Search from "./components/Search";
 import Provide from "./components/Provide";
 import ProvideRegister from "./components/ProvideRegister";
 import MyParkingSpace from "./components/MyParkingSpace";
+import MyParkingGarageUpdate from "./components/MyParkingGarageUpdate";
+import MyParkingLots from "./components/MyParkingLots";
 import SearchParkingLots from "./components/SearchParkingLots";
 import Profile from "./components/Profile";
 import MainProfile from "./components/MainProfile";
@@ -41,22 +43,22 @@ function App() {
   let [users, setUsers] = useState([]);
 
   const handleIncrement = () => {
-    setNumber(prev => prev + 1);
+    setNumber((prev) => prev + 1);
   };
-  const handleWrite = e => {
+  const handleWrite = (e) => {
     setName(e.currentTarget.value);
   };
 
   useEffect(() => {
     axios
       .get("http://localhost:8000/api/users")
-      .then(res => {
+      .then((res) => {
         let data = res.data;
         setUsers(data);
         //  console.log(data);
       })
 
-      .catch(error => console.log(error));
+      .catch((error) => console.log(error));
   }, []);
 
   return (
@@ -100,6 +102,12 @@ function App() {
                       component={MyParkingSpace}
                     />
                     <Route
+                      path="/my-parking-space-update"
+                      component={MyParkingGarageUpdate}
+                    />
+
+                    <Route path="/my-parking-lots" component={MyParkingLots} />
+                    <Route
                       path="/search-parking-lot"
                       component={SearchParkingLots}
                     />
@@ -112,7 +120,7 @@ function App() {
                     <Route path="/parking-request" component={SendRequest} />
                     <Route path="/view-parking-lot" component={ViewGarage} />
                     <Route
-                      path="/transaction-history"
+                      path="/transaction-records"
                       component={TransactionHistory}
                     />
                     <Route component={() => <h1>URL NOT FOUND</h1>} />

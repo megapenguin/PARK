@@ -21,11 +21,12 @@ import {
   InputGroupAddon,
   InputGroup,
   ListGroup,
-  ListGroupItem
+  ListGroupItem,
 } from "reactstrap";
 import logo from "./assets/parklogo.png";
 import Axios from "axios";
 import { ParkingContext } from "../context/ParkingContext";
+import LogoutButton from "./layouts/LogoutButton";
 
 function SearchParkingLots({ history }) {
   let userData = JSON.parse(localStorage.getItem("userData"));
@@ -37,24 +38,25 @@ function SearchParkingLots({ history }) {
   let { setParkingData } = useContext(ParkingContext);
 
   let [searchResult, setSearchResult] = useState([]);
+  let [warning, setWarning] = useState("");
 
   console.log(parkingId);
   setParkingData(parkingId);
   localStorage.setItem("parkingData", JSON.stringify(parkingId));
 
-  const enterLocation = e => {
+  const enterLocation = (e) => {
     e.preventDefault();
     setParkingLotLocation(e.currentTarget.value);
     console.log(parkingLotLocation);
   };
 
-  const searchParking = e => {
+  const searchParking = (e) => {
     e.preventDefault();
     console.log(parkingLotLocation);
     Axios.post(
       `http://localhost:8000/api/providers/searchparking/${parkingLotLocation}`,
       {}
-    ).then(_res => {
+    ).then((_res) => {
       console.log(_res);
       let data = _res.data;
       searchResult = data;
@@ -75,8 +77,12 @@ function SearchParkingLots({ history }) {
 
     //
   };
-  const goToGarage = e => {
-    history.push("/view-parking-lot");
+  const goToGarage = (e) => {
+    if (userData.userStatus === "verified") {
+      history.push("/view-parking-lot");
+    } else {
+      setWarning("You are not yet a verified user");
+    }
   };
 
   return (
@@ -96,7 +102,7 @@ function SearchParkingLots({ history }) {
                   <Input
                     style={{
                       borderTopLeftRadius: 50,
-                      borderBottomLeftRadius: 50
+                      borderBottomLeftRadius: 50,
                     }}
                     onChange={enterLocation}
                   />
@@ -104,7 +110,7 @@ function SearchParkingLots({ history }) {
                     <Button
                       style={{
                         borderBottomRightRadius: 50,
-                        borderTopRightRadius: 50
+                        borderTopRightRadius: 50,
                       }}
                       onClick={searchParking}
                     >
@@ -112,6 +118,7 @@ function SearchParkingLots({ history }) {
                     </Button>
                   </InputGroupAddon>
                 </InputGroup>
+                {warning}
               </Form>
               <div className="row login-form">
                 <div className="col-md-12 loginTitle">
@@ -125,7 +132,7 @@ function SearchParkingLots({ history }) {
                       >
                         <ul
                           className="list-group"
-                          onClick={e => viewGarage(info.id, info.userId)}
+                          onClick={(e) => viewGarage(info.id, info.userId)}
                         >
                           <li
                             className="list-group-item list-group-item-secondary"
@@ -136,7 +143,7 @@ function SearchParkingLots({ history }) {
                                 textAlign: "left",
                                 fontWeight: "bold",
                                 border: "1px solid #ced4da",
-                                width: "30%"
+                                width: "30%",
                               }}
                               src={info.parkingLotPicture}
                             />
@@ -157,9 +164,8 @@ function SearchParkingLots({ history }) {
                     <img src={logo} style={{ width: "80%" }} />
                   )}
                 </div>
-                <div className="col-md-12 registerBtn">
-                  <form></form>
-                </div>
+                <div></div>
+                <LogoutButton />
               </div>
             </CardBody>
           </Card>

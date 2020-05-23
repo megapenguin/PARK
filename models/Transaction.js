@@ -6,35 +6,41 @@ const Transaction = db.define("transactions", {
     type: Sequelize.INTEGER,
     autoIncrement: true,
     primaryKey: true,
-    allowNull: false
+    allowNull: false,
   },
   providerId: {
     type: Sequelize.INTEGER,
-    allowNull: false
+    allowNull: false,
   },
   userId: {
     type: Sequelize.INTEGER,
-    allowNull: false
+    allowNull: false,
   },
   vehiclePlatenumber: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
-
+  parkingStart: {
+    type: Sequelize.TIME,
+    allowNull: false,
+  },
+  parkingEnd: {
+    type: Sequelize.TIME,
+    allowNull: false,
+  },
   requestedAt: {
     type: "TIMESTAMP",
     allowNull: false,
-    defaultValue: Sequelize.literal("CURRENT_TIMESTAMP")
+    defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
   },
-
   createdAt: {
     type: Sequelize.DATE,
-    allowNull: false
+    allowNull: false,
   },
   updatedAt: {
     type: Sequelize.DATE,
-    allowNull: false
-  }
+    allowNull: false,
+  },
 });
 
 module.exports = Transaction;

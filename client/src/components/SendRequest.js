@@ -20,7 +20,7 @@ import {
   Label,
   CustomInput,
   InputGroupAddon,
-  InputGroup
+  InputGroup,
 } from "reactstrap";
 import logo from "./assets/parklogo.png";
 import Axios from "axios";
@@ -32,6 +32,8 @@ function SendRequest({ history }) {
   let userData = JSON.parse(localStorage.getItem("userData"));
   let [parkingInfo, setParkingInfo] = useState([]);
   let [vehiclePlatenumber, setVehiclePlatenumber] = useState("");
+  let parkingStart = "00:00:00";
+  let parkingEnd = "00:00:00";
   let newDate = new Date();
   let requestHour = newDate.getHours();
   let requestMins = newDate.getMinutes();
@@ -43,8 +45,8 @@ function SendRequest({ history }) {
 
   useEffect(() => {
     Axios.post("http://localhost:8000/api/providers/searchparkinglot", {
-      id: parkingData.id
-    }).then(_res => {
+      id: parkingData.id,
+    }).then((_res) => {
       console.log(_res);
       let data = _res.data;
       parkingInfo = data;
@@ -60,7 +62,7 @@ function SendRequest({ history }) {
   console.log(parkingData);
   console.log(garagePicture);
 
-  const handleOnChange = e => {
+  const handleOnChange = (e) => {
     e.preventDefault();
     if (e.currentTarget.name === "vehiclePlatenumer");
     {
@@ -68,7 +70,7 @@ function SendRequest({ history }) {
     }
   };
 
-  const SendRequest = e => {
+  const SendRequest = (e) => {
     e.preventDefault();
     console.log();
     let check = 0;
@@ -79,16 +81,18 @@ function SendRequest({ history }) {
       Axios.post("http://localhost:8000/api/transactions/inserttransaction", {
         providerId: parkingData.id,
         userId: userData.id,
-        vehiclePlatenumber
+        vehiclePlatenumber,
+        parkingStart: parkingStart,
+        parkingEnd: parkingEnd,
         // requestedAt: requestTime
       })
-        .then(_res => {
+        .then((_res) => {
           console.log(_res);
           let data = _res.data;
           history.push("/home");
         })
 
-        .catch(error => console.log(error));
+        .catch((error) => console.log(error));
     } else {
       console.log("error");
     }
@@ -106,7 +110,7 @@ function SendRequest({ history }) {
                   style={{
                     width: "100%",
                     border: "1px solid #ced4da",
-                    marginBottom: 10
+                    marginBottom: 10,
                   }}
                 />
               </CardTitle>
@@ -122,7 +126,7 @@ function SendRequest({ history }) {
                     id="vehiclePlatenumber"
                     style={{
                       borderRadius: 50,
-                      textAlign: "center"
+                      textAlign: "center",
                     }}
                     onChange={handleOnChange}
                     placeholder="Enter the plate number of the vehicle"

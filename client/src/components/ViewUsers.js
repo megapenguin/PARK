@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import noimageicon from "./assets/noimageicon.jpg";
+import Sidebar from "./layouts/Sidebar";
 import parklogo from "./assets/parklogo.png";
 import {
   Table,
@@ -10,7 +11,7 @@ import {
   FormGroup,
   CardImg,
   Form,
-  Label
+  Label,
 } from "reactstrap";
 import { Row, Col, Container } from "reactstrap";
 import NavBar from "./layouts/NavBar";
@@ -31,33 +32,36 @@ function ViewUsers() {
   let [contactNumber, setContactNumber] = useState("");
   let [email, setEmail] = useState("");
   let [searchUser, setSearchUser] = useState("");
+  let [refreshInfo, setRefreshInfo] = useState(false);
+  let [refreshTable, setRefreshTable] = useState(0);
 
   useEffect(() => {
     Axios.get("http://localhost:8000/api/users/getverifiedusers")
-      .then(_res => {
+      .then((_res) => {
         console.log(_res);
         let data = _res.data;
         searchResult = data;
         setSearchResult(searchResult);
         console.log(searchResult);
       })
-      .catch(error => console.log(error));
+      .catch((error) => console.log(error));
     console.log("what happend?");
-  }, []);
+    console.log("refreshTable");
+  }, [refreshTable]);
 
-  const enterSearch = e => {
+  const enterSearch = (e) => {
     e.preventDefault();
     setSearchUser(e.currentTarget.value);
     console.log(searchUser);
   };
 
-  const handleOnSearch = e => {
+  const handleOnSearch = (e) => {
     e.preventDefault();
     Axios.post("http://localhost:8000/api/users/searchusers", {
       userId: searchUser,
       firstName: searchUser,
-      lastName: searchUser
-    }).then(_res => {
+      lastName: searchUser,
+    }).then((_res) => {
       console.log(_res);
       let data = _res.data;
       searchResult = data;
@@ -69,8 +73,9 @@ function ViewUsers() {
     console.log(searchResult);
   };
 
-  const handleOnSelect = index => {
+  const handleOnSelect = (index) => {
     console.log(index);
+    setRefreshTable(false);
     setIdFront(searchResult[index].idFront);
     setIdBack(searchResult[index].idBack);
     setIdWithSelfie(searchResult[index].idWithSelfie);
@@ -81,10 +86,12 @@ function ViewUsers() {
     setLastname(searchResult[index].lastName);
     setEmail(searchResult[index].email);
     setContactNumber(searchResult[index].contactNumber);
+    setRefreshInfo(true);
   };
 
-  const handleOnChange = e => {
+  const handleOnChange = (e) => {
     e.preventDefault();
+
     if (e.currentTarget.name === "firstname") {
       setFirstName(e.currentTarget.value);
     }
@@ -100,32 +107,68 @@ function ViewUsers() {
     }
   };
 
-  const handleToUpdate = e => {
+  const handleToUpdate = (e) => {
     e.preventDefault();
+    setRefreshInfo(false);
+    setRefreshTable(true);
     Axios.post("http://localhost:8000/api/users/updateusers", {
       id: userId,
       firstName: firstName,
       lastName: lastName,
-
       contactNumber: contactNumber,
-      email: email
-    }).then(_res => {
+      email: email,
+    }).then((_res) => {
       console.log(_res);
+      setRefreshTable(true);
     });
+    // searchResult[index].firstName=firstName;
+    // searchResult[index].lastName;
+    // searchResult[index].email;
+    // searchResult[index].contactNumber;
+    Axios.get("http://localhost:8000/api/users/getverifiedusers").then(
+      (_res) => {
+        console.log(_res);
+        let newdata = _res.data;
+        searchResult = newdata;
+        setSearchResult(searchResult);
+        console.log("success update");
+        console.log(searchResult);
+        console.log(refreshInfo);
+        setRefreshTable(true);
+      }
+    );
+    setRefreshTable(true);
+  };
+  const handleOnEnter = (e) => {
+    if (e.key === "Enter") {
+      Axios.post("http://localhost:8000/api/users/searchusers", {
+        userId: searchUser,
+        firstName: searchUser,
+        lastName: searchUser,
+      }).then((_res) => {
+        console.log(_res);
+        let data = _res.data;
+        searchResult = data;
+        setSearchResult(searchResult);
+        console.log("success");
+        console.log(searchResult);
+      });
+    }
   };
 
   return (
     <React.Fragment>
-      <Container className="mb-5">
-        <Row className="mb-5">
+      <Container>
+        <Sidebar />
+        <Row>
           <Col className="mb-5">
             <NavBar />
           </Col>
         </Row>
       </Container>
 
-      <Container>
-        <Row className="mt-5">
+      <Container className="mt-5 mr-5">
+        <Row>
           <Col sm="12" md={{ size: 6, offset: 3 }}>
             <h1 className="mt-5 shadow mt-5" style={{ borderRadius: 50 }}>
               {" "}
@@ -133,9 +176,6 @@ function ViewUsers() {
             </h1>
           </Col>
         </Row>
-      </Container>
-
-      <Container>
         <Row>
           <Col>
             <Container className="mt-3">
@@ -145,16 +185,17 @@ function ViewUsers() {
                   <Input
                     style={{
                       borderTopLeftRadius: 50,
-                      borderBottomLeftRadius: 50
+                      borderBottomLeftRadius: 50,
                     }}
                     onChange={enterSearch}
+                    onKeyPress={handleOnEnter}
                     placeholder="Search Users"
                   />
                   <InputGroupAddon addonType="append">
                     <Button
                       style={{
                         borderBottomRightRadius: 50,
-                        borderTopRightRadius: 50
+                        borderTopRightRadius: 50,
                       }}
                       onClick={handleOnSearch}
                     >
@@ -164,19 +205,21 @@ function ViewUsers() {
                 </InputGroup>
                 <Table
                   className="mt-3"
-                  style={{ textAlign: "center", width: 525, border: "hidden" }}
+                  style={{ textAlign: "center", border: "hidden" }}
                 >
-                  <tr>
-                    <th>ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                  </tr>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                    </tr>
+                  </thead>
                 </Table>
                 <Table hover responsive>
                   <tbody>
                     {searchResult.length !== 0
                       ? searchResult.map((info, index) => (
-                          <tr id={index} onClick={e => handleOnSelect(index)}>
+                          <tr id={index} onClick={(e) => handleOnSelect(index)}>
                             <th scope="row">{info.id}</th>
                             <td>{info.firstName}</td>
                             <td>{info.lastName}</td>
@@ -195,31 +238,31 @@ function ViewUsers() {
                 <CardTitle>
                   <img
                     id="idfront"
-                    src={idFront ? idFront : noimageicon}
+                    src={refreshInfo === true ? idFront : noimageicon}
                     style={{
                       height: 150,
                       width: 150,
-                      border: "1px solid black"
+                      border: "1px solid black",
                     }}
                   ></img>{" "}
                   <img
                     id="idback"
-                    src={idBack ? idBack : noimageicon}
+                    src={refreshInfo === true ? idBack : noimageicon}
                     style={{
                       height: 150,
                       width: 150,
-                      border: "1px solid black"
+                      border: "1px solid black",
                     }}
                   ></img>{" "}
                 </CardTitle>
                 <CardBody>
                   <img
                     id="idwithselfie"
-                    src={idWithSelfie ? idWithSelfie : noimageicon}
+                    src={refreshInfo === true ? idWithSelfie : noimageicon}
                     style={{
                       height: 150,
                       width: 150,
-                      border: "1px solid black"
+                      border: "1px solid black",
                     }}
                   ></img>{" "}
                 </CardBody>
@@ -230,16 +273,16 @@ function ViewUsers() {
       </Container>
       <Row>
         <Container>
-          <h2 className="mt-5">User Information</h2>
+          <h2 className="mt-2">User Information</h2>
           <Card style={{ border: "hidden" }}>
-            <CardTitle className="mt-5">
+            <CardTitle className="mt-2">
               <img
                 id="profilepicture"
-                src={profilePicture ? profilePicture : noimageicon}
+                src={refreshInfo === true ? profilePicture : noimageicon}
                 style={{
                   height: 150,
                   width: 150,
-                  border: "1px solid black"
+                  border: "1px solid black",
                 }}
               ></img>{" "}
             </CardTitle>
@@ -250,14 +293,19 @@ function ViewUsers() {
                   <Col md={6}>
                     <FormGroup>
                       <Label style={{ fontWeight: "bold" }}>
-                        <h5> {userId ? userId : "User ID"}</h5>
+                        <h5>
+                          Use ID:{refreshInfo === true ? userId : "User ID"}
+                        </h5>
                       </Label>
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
                       <Label style={{ fontWeight: "bold" }}>
-                        <h5> {userName ? userName : "User Name"}</h5>
+                        <h5>
+                          Username:
+                          {refreshInfo === true ? userName : "Username"}
+                        </h5>
                       </Label>
                     </FormGroup>
                   </Col>
@@ -266,12 +314,12 @@ function ViewUsers() {
                       <Label for="firstname">Firstname</Label>
                       <Input
                         type="text"
-                        name="firstName"
-                        id="firstName"
+                        name="firstname"
+                        id="firstname"
                         onChange={handleOnChange}
                         style={{ textAlign: "center", borderRadius: 10 }}
-                        placeholder={firstName ? firstName : "Firstname"}
-                      />
+                        value={refreshInfo === true ? firstName : "Firstname"}
+                      ></Input>
                     </FormGroup>
                   </Col>
                   <Col md={6}>
@@ -283,7 +331,7 @@ function ViewUsers() {
                         id="lastname"
                         onChange={handleOnChange}
                         style={{ textAlign: "center", borderRadius: 10 }}
-                        placeholder={lastName ? lastName : "Lastname"}
+                        value={refreshInfo === true ? lastName : "Lastname"}
                       />
                     </FormGroup>
                   </Col>
@@ -296,8 +344,10 @@ function ViewUsers() {
                         id="contactnumber"
                         onChange={handleOnChange}
                         style={{ textAlign: "center", borderRadius: 10 }}
-                        placeholder={
-                          contactNumber ? contactNumber : "Contact Number"
+                        value={
+                          refreshInfo === true
+                            ? contactNumber
+                            : "Contact Number"
                         }
                       />
                     </FormGroup>
@@ -311,28 +361,28 @@ function ViewUsers() {
                         id="emailaddress"
                         onChange={handleOnChange}
                         style={{ textAlign: "center", borderRadius: 10 }}
-                        placeholder={email ? email : "Email Address"}
+                        value={refreshInfo === true ? email : "Email Address"}
                       />
                     </FormGroup>
                   </Col>
-                  <Col>
+                  {/* <Col>
                     <FormGroup>
                       <Label for="address">Personal Address</Label>
                       <Input
-                        type="text"
+                        // defaultValue="Reset"
                         name="address"
                         id="address"
                         style={{ textAlign: "center", borderRadius: 10 }}
-                        placeholder="Address"
+                        value="Address"
                       />
                     </FormGroup>
-                  </Col>
+                  </Col> */}
                 </Row>
               </Form>
               <Button color="success" onClick={handleToUpdate}>
-                Update
+                Update {<Input type="reset" defaultValue="Reset" hidden />}
               </Button>{" "}
-              <Button color="danger">Decline</Button>{" "}
+              <Button color="danger">Delete</Button>{" "}
             </CardBody>
           </Card>
         </Container>

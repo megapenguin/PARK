@@ -4,6 +4,7 @@ const cors = require("cors");
 const user = require("./router/user");
 const provider = require("./router/provider");
 const transaction = require("./router/transaction");
+const update = require("./router/update");
 const sequelize = require("./config/database");
 const fileUpload = require("express-fileupload");
 const randomString = require("randomstring");
@@ -13,7 +14,7 @@ sequelize
   .then(() => {
     console.log("Connection has been established successfully.");
   })
-  .catch(err => {
+  .catch((err) => {
     console.error("Unable to connect to the database:", err);
   });
 
@@ -28,5 +29,6 @@ app.use(fileUpload());
 app.use("/api/users", user);
 app.use("/api/providers", provider);
 app.use("/api/transactions", transaction);
+app.use("/api/updates", update);
 
 app.listen(8000, () => console.log("Server running at port 8000"));

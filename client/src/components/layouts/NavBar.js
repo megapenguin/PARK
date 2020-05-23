@@ -14,7 +14,7 @@ import {
   DropdownMenu,
   DropdownItem,
   NavbarText,
-  ButtonToggle
+  ButtonToggle,
 } from "reactstrap";
 
 function NavBar() {
@@ -31,23 +31,23 @@ function NavBar() {
       style={{}}
     >
       <img
-        className="mr-2 shadow mt-2"
+        className="mb-2 shadow mt-2"
         src={parklogo}
         style={{
           width: 75,
           height: 75,
           borderRadius: "50%",
-          border: "1px white  "
+          border: "1px white  ",
         }}
-      ></img>
-      <NavbarBrand href="/admin" style={{ fontWeight: "bold" }}>
-        {" "}
-        ADMIN
-      </NavbarBrand>
+      />
+      <NavbarBrand href="/admin" style={{ fontWeight: "bold" }}></NavbarBrand>
       <NavbarToggler onClick={toggle} />
 
       <Collapse isOpen={isOpen} navbar>
-        <Nav className="mr-auto" navbar>
+        <Nav className="ml-auto mb-auto" navbar>
+          <NavbarBrand href="/admin" style={{ fontWeight: "bold" }}>
+            ADMIN
+          </NavbarBrand>
           <NavItem>
             <NavLink href="/admin" style={{ color: "black" }}>
               Home
@@ -63,7 +63,7 @@ function NavBar() {
               Providers
             </NavLink>
           </NavItem>
-          <NavItem>
+          {/* <NavItem>
             <NavLink href="/view-unverified-users" style={{ color: "black" }}>
               Unverified Users
             </NavLink>
@@ -75,39 +75,31 @@ function NavBar() {
             >
               Unverified Porviders
             </NavLink>
-          </NavItem>
+          </NavItem> */}
           <NavItem>
             <NavLink href="/transaction-history" style={{ color: "black" }}>
-              Transaction Records
+              History
             </NavLink>
           </NavItem>
-
+          <NavItem></NavItem>
           <UncontrolledDropdown nav inNavbar>
             <DropdownToggle nav caret>
-              Options
+              Requests
             </DropdownToggle>
             <DropdownMenu right>
-              <DropdownItem>Option 1</DropdownItem>
-              <DropdownItem>Option 2</DropdownItem>
-              <DropdownItem divider />
-              <DropdownItem>Reset</DropdownItem>
+              <DropdownItem href="/view-unverified-users">
+                Unverified Users
+              </DropdownItem>
+              <DropdownItem href="/view-unverified-providers">
+                Unverified Providers
+              </DropdownItem>
             </DropdownMenu>
           </UncontrolledDropdown>
+
+          <NavLink href="/welcome">
+            <ButtonToggle color="danger">Log Out</ButtonToggle>
+          </NavLink>
         </Nav>
-        <NavbarText>
-          {" "}
-          <img
-            className="mr-3 shadow mt-2"
-            src={noimageicon}
-            style={{
-              width: 75,
-              height: 75,
-              borderRadius: "50%",
-              border: "1px white  "
-            }}
-          ></img>
-        </NavbarText>
-        <ButtonToggle color="danger">Log Out</ButtonToggle>{" "}
       </Collapse>
     </Navbar>
   );

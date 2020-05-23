@@ -8,11 +8,11 @@ const Op = Sequelize.Op;
 
 router.get("/gettransactions", (req, res) => {
   Transaction.findAll()
-    .then(_res => {
+    .then((_res) => {
       res.json(_res);
       console.log(res);
     })
-    .catch(error => console.log(error));
+    .catch((error) => console.log(error));
 });
 
 router.post("/searchtransactions", (req, res) => {
@@ -23,32 +23,32 @@ router.post("/searchtransactions", (req, res) => {
       [Op.or]: [
         {
           id: {
-            [Op.like]: transactionId
-          }
+            [Op.like]: transactionId,
+          },
         },
         {
           userId: {
-            [Op.like]: userId
-          }
+            [Op.like]: userId,
+          },
         },
         {
           providerId: {
-            [Op.like]: providerId
-          }
+            [Op.like]: providerId,
+          },
         },
         {
           vehiclePlatenumber: {
-            [Op.like]: "%" + vehiclePlatenumber + "%"
-          }
-        }
-      ]
-    }
+            [Op.like]: "%" + vehiclePlatenumber + "%",
+          },
+        },
+      ],
+    },
   })
-    .then(_res => {
+    .then((_res) => {
       res.json(_res);
       console.log(res);
     })
-    .catch(error => console.log(error));
+    .catch((error) => console.log(error));
 });
 
 router.post("/inserttransaction", (req, res) => {
@@ -60,18 +60,26 @@ router.post("/inserttransaction", (req, res) => {
 
   //User.update({ where: { id } });
 
-  let { providerId, userId, vehiclePlatenumber } = req.body;
+  let {
+    providerId,
+    userId,
+    vehiclePlatenumber,
+    parkingStart,
+    parkingEnd,
+  } = req.body;
 
   Transaction.create({
     providerId,
     userId,
-    vehiclePlatenumber
+    vehiclePlatenumber,
+    parkingStart,
+    parkingEnd,
   })
-    .then(_res => {
+    .then((_res) => {
       res.json(_res);
       console.log(_res);
     })
-    .catch(error => console.log(error));
+    .catch((error) => console.log(error));
 });
 
 router.post("/searchtransactions/:userId", (req, res) => {
@@ -81,22 +89,22 @@ router.post("/searchtransactions/:userId", (req, res) => {
   console.log(userId);
   Transaction.findAll({
     where: {
-      userId: userId
-    }
+      userId: userId,
+    },
   })
-    .then(_res => {
+    .then((_res) => {
       res.json(_res);
       console.log(res);
     })
-    .catch(error => console.log(error));
+    .catch((error) => console.log(error));
 });
 
 router.get("/get", (req, res) => {
   Transaction.findAll()
-    .then(_res => {
+    .then((_res) => {
       res.json(_res);
     })
-    .catch(error => console.log(error));
+    .catch((error) => console.log(error));
 });
 
 module.exports = router;

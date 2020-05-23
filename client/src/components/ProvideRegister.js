@@ -17,12 +17,12 @@ import {
   Form,
   FormGroup,
   Input,
-  Label
+  Label,
 } from "reactstrap";
 import { isEmpty } from "validator";
 import Axios from "axios";
 
-function ProvideRegister() {
+function ProvideRegister({ history }) {
   let userData = JSON.parse(localStorage.getItem("userData"));
   const [parkingPictureFile, setParkingPictureFile] = useState("");
   const [parkingPictureFilename, setParkingPictureFilename] = useState(
@@ -45,7 +45,7 @@ function ProvideRegister() {
 
   // console.log(file, filename);
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     e.preventDefault();
     if (e.currentTarget.name === "personalAddress") {
       setPersonalAddress(e.currentTarget.value);
@@ -54,8 +54,8 @@ function ProvideRegister() {
       setProviderStatus("unverified");
       setVehicleType("");
       setMobileNumber("");
-      setTotalSlots("");
-      setReservedSlots("");
+      setTotalSlots("0");
+      setReservedSlots("0");
       setparkingPrice("");
       console.log(personalAddress);
     }
@@ -65,12 +65,12 @@ function ProvideRegister() {
     }
   };
 
-  const onChange = e => {
+  const onChange = (e) => {
     setParkingPictureFile(e.target.files[0]);
     setParkingPictureFilename(e.target.files[0].name);
   };
 
-  const onSubmit = async e => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     const parkingPictureData = new FormData();
     parkingPictureData.append("parkingPictureFile", parkingPictureFile);
@@ -80,8 +80,8 @@ function ProvideRegister() {
         parkingPictureData,
         {
           headers: {
-            "Content-Type": "mulifrom/form-data"
-          }
+            "Content-Type": "mulifrom/form-data",
+          },
         }
       );
       const { fileName, filePath } = res.data;
@@ -92,17 +92,21 @@ function ProvideRegister() {
       if (err.response.status === 500) {
         console.log("There was a problem with the server");
       } else {
+        history.push("/profile");
         console.log(err.response.data.msg);
       }
     }
   };
-  const onRegister = e => {
+  const onRegister = (e) => {
     e.preventDefault();
     let check = 0;
     if (isEmpty(parkingLotLocation)) {
       check++;
     }
     if (isEmpty(personalAddress)) {
+      check++;
+    }
+    if (!uploadedFileParkingPicture) {
       check++;
     }
     console.log(check);
@@ -121,16 +125,20 @@ function ProvideRegister() {
         reservedSlots,
         providerStatus,
         parkingLotPicture: uploadedFileParkingPicture.filePath,
-        parkingLotStatus
-      }).then(_res => {
+        parkingLotStatus,
+      }).then((_res) => {
         console.log(_res);
         let data = _res.data;
         console.log(data);
       });
+      history.push("/welcome");
     } else {
       e.preventDefault();
       console.log("error");
     }
+  };
+  const handleToBack = (e) => {
+    history.push("/home");
   };
 
   return (
@@ -178,7 +186,7 @@ function ProvideRegister() {
                             style={{
                               width: "50%",
                               border: "1px solid #ced4da",
-                              marginBottom: 10
+                              marginBottom: 10,
                             }}
                           />
                         </CardSubtitle>
@@ -214,6 +222,19 @@ function ProvideRegister() {
                       onClick={onRegister}
                     >
                       Register
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <div className="col-md-12 registerBtn">
+                <form>
+                  <div class="">
+                    <button
+                      type="submit"
+                      class="btnSign font-weight-bold"
+                      onClick={handleToBack}
+                    >
+                      Back
                     </button>
                   </div>
                 </form>

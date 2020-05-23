@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Sidebar from "./layouts/Sidebar";
 import noimageicon from "./assets/noimageicon.jpg";
 import parklogo from "./assets/parklogo.png";
 import {
@@ -10,7 +11,7 @@ import {
   FormGroup,
   CardImg,
   Form,
-  Label
+  Label,
 } from "reactstrap";
 import { Row, Col, Container } from "reactstrap";
 import NavBar from "./layouts/NavBar";
@@ -28,18 +29,18 @@ function TransactionRecords() {
 
   useEffect(() => {
     Axios.get("http://localhost:8000/api/transactions/gettransactions")
-      .then(_res => {
+      .then((_res) => {
         console.log(_res);
         let data = _res.data;
         searchResult = data;
         setSearchResult(searchResult);
         console.log(searchResult);
       })
-      .catch(error => console.log(error));
+      .catch((error) => console.log(error));
     console.log("what happend?");
   }, []);
 
-  const handleOnSelect = index => {
+  const handleOnSelect = (index) => {
     console.log(index);
     setPlateNumber(searchResult[index].vehiclePlatenumber);
     setDateAndTime(
@@ -48,8 +49,8 @@ function TransactionRecords() {
     Axios.post("http://localhost:8000/api/users/searchusers", {
       userId: searchResult[index].userId,
       firstName: searchResult[index].userId,
-      lastName: searchResult[index].userId
-    }).then(_res => {
+      lastName: searchResult[index].userId,
+    }).then((_res) => {
       console.log(_res);
       let data = _res.data[0];
       userInfo = data;
@@ -61,8 +62,8 @@ function TransactionRecords() {
     Axios.post("http://localhost:8000/api/providers/searchproviders", {
       providerId: searchResult[index].providerId,
       firstName: searchResult[index].providerId,
-      lastName: searchResult[index].providerId
-    }).then(_res => {
+      lastName: searchResult[index].providerId,
+    }).then((_res) => {
       console.log(_res);
       let data = _res.data[0];
       providerInfo = data;
@@ -71,20 +72,20 @@ function TransactionRecords() {
       console.log(providerInfo);
     });
   };
-  const enterSearch = e => {
+  const enterSearch = (e) => {
     e.preventDefault();
     setSearchTransaction(e.currentTarget.value);
     console.log(searchTransaction);
   };
 
-  const handleOnSearch = e => {
+  const handleOnSearch = (e) => {
     e.preventDefault();
     Axios.post("http://localhost:8000/api/transactions/searchtransactions", {
       transactionId: searchTransaction,
       providerId: searchTransaction,
       userId: searchTransaction,
-      vehiclePlatenumber: searchTransaction
-    }).then(_res => {
+      vehiclePlatenumber: searchTransaction,
+    }).then((_res) => {
       console.log(_res);
       let data = _res.data;
       searchResult = data;
@@ -98,22 +99,22 @@ function TransactionRecords() {
 
   return (
     <React.Fragment>
+      <Sidebar />
       <Row>
         <Col className="mb-5">
           <NavBar />
         </Col>
       </Row>
-      <Container className="mt-6">
+
+      <Container className="mt-5 mr-5 mb-5">
         <Row className="mt-5">
           <Col sm="12" md={{ size: 6, offset: 3 }}>
             <h1 className="mt-5 shadow mt-5" style={{ borderRadius: 50 }}>
               {" "}
-              Transaction Records
+              History
             </h1>
           </Col>
         </Row>
-      </Container>
-      <Container>
         <Row></Row>
         <Row>
           <Col>
@@ -122,11 +123,11 @@ function TransactionRecords() {
                 {" "}
                 <Col>
                   <Card
-                    className="mt-5 mb-5"
+                    className="mt-2 mb-5"
                     style={{
                       textAlign: "center",
 
-                      border: "hidden"
+                      border: "hidden",
                     }}
                   >
                     <Label>
@@ -183,11 +184,11 @@ function TransactionRecords() {
                 </Col>
                 <Col>
                   <Card
-                    className="mt-5 mb-5"
+                    className="mt-2 mb-5"
                     style={{
                       textAlign: "center",
 
-                      border: "hidden"
+                      border: "hidden",
                     }}
                   >
                     <Label>
@@ -255,7 +256,7 @@ function TransactionRecords() {
                   <Input
                     style={{
                       borderTopLeftRadius: 50,
-                      borderBottomLeftRadius: 50
+                      borderBottomLeftRadius: 50,
                     }}
                     placeholder="Search Transactions"
                     onChange={enterSearch}
@@ -264,7 +265,7 @@ function TransactionRecords() {
                     <Button
                       style={{
                         borderBottomRightRadius: 50,
-                        borderTopRightRadius: 50
+                        borderTopRightRadius: 50,
                       }}
                       onClick={handleOnSearch}
                     >
@@ -272,29 +273,29 @@ function TransactionRecords() {
                     </Button>
                   </InputGroupAddon>
                 </InputGroup>
-
                 <Table
                   hover
                   responsive
                   style={{
                     textAlign: "center",
-
-                    border: "hidden"
+                    border: "hidden",
                   }}
                 >
-                  <tr fixed>
-                    <th>Transaction ID</th>
-                    <th>Provider ID</th>
-                    <th>User ID</th>
-                    <th>Plate Number</th>
-                    <th>Time</th>
-                    <th>Date</th>
-                  </tr>
+                  <thead>
+                    <tr>
+                      <th>Transaction ID</th>
+                      <th>Provider ID</th>
+                      <th>User ID</th>
+                      <th>Plate Number</th>
+                      <th>Time</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
 
                   <tbody>
                     {searchResult.length !== 0
                       ? searchResult.map((info, index) => (
-                          <tr id={index} onClick={e => handleOnSelect(index)}>
+                          <tr id={index} onClick={(e) => handleOnSelect(index)}>
                             <th scope="row">{info.id}</th>
                             <td>{info.providerId}</td>
                             <td>{info.userId}</td>

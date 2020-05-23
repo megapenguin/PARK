@@ -1,21 +1,25 @@
 import React from "react";
-import NavBar from "./layouts/NavBar";
+import Sidebar from "./layouts/Sidebar";
 import Cards from "./layouts/Cards";
-import { Row, Col, Container, Jumbotron } from "reactstrap";
+import Navbar from "./layouts/NavBar";
+import { Row, Col, Container, Jumbotron, Nav } from "reactstrap";
 
 function Admin() {
   return (
     <React.Fragment>
+      <Sidebar />
       <Row>
-        <Col>
-          <NavBar />
+        <Col className="mb-5">
+          <Navbar />
+        </Col>
+      </Row>{" "}
+      <Row className="mt-5">
+        <Col className="mt-5">
+          <Container className="mt-5 mr-5">
+            <Cards />
+          </Container>
         </Col>
       </Row>
-      <Container className="mt-5">
-        <Row>
-          <Cards />
-        </Row>
-      </Container>
     </React.Fragment>
   );
 }

@@ -127,13 +127,22 @@ router.post("/searchusers", (req, res) => {
 });
 
 router.get("/getunverifiedusers", (req, res) => {
-  const status = "";
-  console.log(status);
+  const status1 = "unverified";
+  const status2 = "";
   User.findAll({
     where: {
-      userStatus: {
-        [Op.like]: status,
-      },
+      [Op.or]: [
+        {
+          userStatus: {
+            [Op.like]: status1,
+          },
+        },
+        {
+          userStatus: {
+            [Op.like]: status2,
+          },
+        },
+      ],
     },
   })
     .then((_res) => {

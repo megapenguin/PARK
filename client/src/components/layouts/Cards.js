@@ -1,7 +1,17 @@
 import React from "react";
 import noimageicon from "././noimageicon.jpg";
-import parklogo from "././parklogo.png";
-
+import park from "././park.png";
+import user from "././user.png";
+import history from "././history.png";
+import request from "././request.png";
+import {
+  GoRequestChanges,
+  FaUserAlt,
+  FaRedRiver,
+  FaCarAlt,
+  FaMailBulk,
+  FaHistory,
+} from "react-icons/fa";
 import {
   Card,
   Button,
@@ -11,7 +21,7 @@ import {
   Col,
   Container,
   CardImg,
-  CardBody
+  CardBody,
 } from "reactstrap";
 
 function Cards() {
@@ -19,68 +29,74 @@ function Cards() {
     <Container className="mt-5">
       <Row className="mt-5">
         <Col>
-          <Container style={{ height: 350, width: 250 }}>
-            <Card hover className="shadow mt-3">
-              <CardImg
-                style={{ width: "100%", height: "100%" }}
-                src={parklogo}
-                alt="Card image cap"
-              />
-              <CardBody>
-                <CardTitle>Verified Users</CardTitle>
-                <CardText></CardText>
-                <Button href="/view-users">View Users</Button>
-              </CardBody>
-            </Card>
-          </Container>
+          <Card hover className="shadow mt-1">
+            <CardTitle>
+              <h1>
+                <img
+                  className="mt-3"
+                  src={user}
+                  style={{ width: 200, height: 200 }}
+                ></img>
+              </h1>
+            </CardTitle>
+            <CardBody>
+              <Button href="/view-users"> Users</Button>
+            </CardBody>
+          </Card>
         </Col>
         <Col>
-          <Container style={{ height: 350, width: 250 }}>
-            <Card className="shadow mt-3">
-              <CardImg
-                style={{ width: "100%", height: "100%" }}
-                src={parklogo}
-                alt="Card image cap"
-              />
-              <CardBody>
-                <CardTitle>Parking Providers</CardTitle>
-                <CardText></CardText>
-                <Button>View Providers</Button>
-              </CardBody>
-            </Card>
-          </Container>
+          <Card className="shadow mt-1">
+            <CardTitle>
+              <h1>
+                <img
+                  className="mt-3"
+                  src={park}
+                  style={{ width: 200, height: 200 }}
+                ></img>
+                {/* <FaCarAlt style={{ width: 150, height: 200 }} /> */}
+              </h1>
+            </CardTitle>
+            <CardBody>
+              <Button href="/view-providers">Providers</Button>
+            </CardBody>
+          </Card>
         </Col>
         <Col>
-          <Container style={{ height: 350, width: 250 }}>
-            <Card className="shadow mt-3">
-              <CardImg
-                style={{ width: "100%", height: "100%" }}
-                src={parklogo}
-                alt="Card image cap"
-              />
-              <CardBody>
-                <CardTitle>Unverified Users</CardTitle>
-                <CardText></CardText>
-                <Button>Verify Users</Button>
-              </CardBody>
-            </Card>
-          </Container>
+          <Card className="shadow mt-1">
+            <CardTitle>
+              <h1>
+                <img
+                  className="mt-3"
+                  src={request}
+                  style={{ width: 200, height: 200 }}
+                ></img>
+                {/* <FaMailBulk style={{ width: 150, height: 200 }} /> */}
+              </h1>
+            </CardTitle>
+            <CardBody>
+              <Button href="/view-unverified-users">Users</Button>
+              <Button className="ml-2" href="/view-unverified-providers">
+                Providers
+              </Button>
+            </CardBody>
+          </Card>
         </Col>
         <Col>
-          <Container style={{ height: 350, width: 250 }}>
-            <Card className="shadow mt-3">
-              <CardImg
-                style={{ width: "100%", height: "100%" }}
-                src={parklogo}
-                alt="Card image cap"
-              />
-              <CardBody>
-                <CardTitle>Unverified Providers</CardTitle>
-                <CardText></CardText>
-                <Button>Verify Providers</Button>
-              </CardBody>
-            </Card>
-          </Container>
+          <Card className="shadow mt-1">
+            <CardTitle>
+              <h1>
+                <img
+                  className="mt-3"
+                  src={history}
+                  style={{ width: 200, height: 200 }}
+                ></img>
+                {/* <FaHistory style={{ width: 150, height: 200 }} /> */}
+              </h1>
+            </CardTitle>
+            <CardBody>
+              <Button href="/transaction-history">History</Button>
+            </CardBody>
+          </Card>
         </Col>
       </Row>
     </Container>

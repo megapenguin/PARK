@@ -12,15 +12,15 @@ router.get("/getverifiedproviders", (req, res) => {
   Provider.findAll({
     where: {
       providerStatus: {
-        [Op.like]: providerStatus
-      }
-    }
+        [Op.like]: providerStatus,
+      },
+    },
   })
-    .then(_res => {
+    .then((_res) => {
       res.json(_res);
       console.log(res);
     })
-    .catch(error => console.log(error));
+    .catch((error) => console.log(error));
 });
 
 router.post("/searchproviders", (req, res) => {
@@ -33,36 +33,36 @@ router.post("/searchproviders", (req, res) => {
       [Op.and]: [
         {
           providerStatus: {
-            [Op.like]: status
-          }
+            [Op.like]: status,
+          },
         },
         {
           [Op.or]: [
             {
               id: {
-                [Op.like]: providerId
-              }
+                [Op.like]: providerId,
+              },
             },
             {
               firstName: {
-                [Op.like]: "%" + firstName + "%"
-              }
+                [Op.like]: "%" + firstName + "%",
+              },
             },
             {
               lastName: {
-                [Op.like]: "%" + lastName + "%"
-              }
-            }
-          ]
-        }
-      ]
-    }
+                [Op.like]: "%" + lastName + "%",
+              },
+            },
+          ],
+        },
+      ],
+    },
   })
-    .then(_res => {
+    .then((_res) => {
       res.json(_res);
       console.log(res);
     })
-    .catch(error => console.log(error));
+    .catch((error) => console.log(error));
 });
 
 router.get("/getunverifiedproviders", (req, res) => {
@@ -71,15 +71,15 @@ router.get("/getunverifiedproviders", (req, res) => {
   Provider.findAll({
     where: {
       providerStatus: {
-        [Op.like]: providerStatus
-      }
-    }
+        [Op.like]: providerStatus,
+      },
+    },
   })
-    .then(_res => {
+    .then((_res) => {
       res.json(_res);
       console.log(res);
     })
-    .catch(error => console.log(error));
+    .catch((error) => console.log(error));
 });
 
 router.post("/updateprovider", (req, res) => {
@@ -92,7 +92,7 @@ router.post("/updateprovider", (req, res) => {
     parkingPrice,
     totalSlots,
     parkingLotStatus,
-    providerStatus
+    providerStatus,
   } = req.body;
   console.log(req.body);
 
@@ -105,15 +105,34 @@ router.post("/updateprovider", (req, res) => {
       parkingPrice,
       totalSlots,
       parkingLotStatus,
-      providerStatus
+      providerStatus,
     },
     { where: { id } }
   )
-    .then(_res => {
+    .then((_res) => {
       res.json(_res);
       console.log(_res);
     })
-    .catch(error => console.log(error));
+    .catch((error) => console.log(error));
+});
+
+router.post("/userupdateprovider", (req, res) => {
+  let { id, parkingLotName, mobileNumber, parkingLotPicture } = req.body;
+  console.log(req.body);
+
+  Provider.update(
+    {
+      parkingLotName,
+      mobileNumber,
+      parkingLotPicture,
+    },
+    { where: { id } }
+  )
+    .then((_res) => {
+      res.json(_res);
+      console.log(_res);
+    })
+    .catch((error) => console.log(error));
 });
 
 router.post("/insertprovider", (req, res) => {
@@ -139,7 +158,7 @@ router.post("/insertprovider", (req, res) => {
     reservedSlots,
     providerStatus,
     parkingLotPicture,
-    parkingLotStatus
+    parkingLotStatus,
   } = req.body;
 
   Provider.create({
@@ -156,13 +175,13 @@ router.post("/insertprovider", (req, res) => {
     reservedSlots,
     providerStatus,
     parkingLotPicture,
-    parkingLotStatus
+    parkingLotStatus,
   })
-    .then(_res => {
+    .then((_res) => {
       res.json(_res);
       console.log(_res);
     })
-    .catch(error => console.log(error));
+    .catch((error) => console.log(error));
 });
 
 router.post("/searchprovider", (req, res) => {
@@ -172,7 +191,7 @@ router.post("/searchprovider", (req, res) => {
 
   Provider.findOne({ where: { userId, firstName, lastName } })
 
-    .then(_res => {
+    .then((_res) => {
       if (_res) {
         let {
           id,
@@ -189,7 +208,7 @@ router.post("/searchprovider", (req, res) => {
           reservedSlots,
           providerStatus,
           parkingLotPicture,
-          parkingLotStatus
+          parkingLotStatus,
         } = _res.dataValues;
         res.json({
           id,
@@ -206,7 +225,7 @@ router.post("/searchprovider", (req, res) => {
           reservedSlots,
           providerStatus,
           parkingLotPicture,
-          parkingLotStatus
+          parkingLotStatus,
         });
       } else {
         res.json(_res);
@@ -214,7 +233,59 @@ router.post("/searchprovider", (req, res) => {
 
       console.log(_res);
     })
-    .catch(error => console.log(error));
+    .catch((error) => console.log(error));
+});
+
+router.post("/providerparkinglot", (req, res) => {
+  console.log(req.body);
+
+  let { id, firstName, lastName } = req.body;
+
+  Provider.findOne({ where: { id, firstName, lastName } })
+
+    .then((_res) => {
+      if (_res) {
+        let {
+          id,
+          userId,
+          firstName,
+          lastName,
+          personalAddress,
+          parkingLotName,
+          parkingLotLocation,
+          vehicleType,
+          mobileNumber,
+          parkingPrice,
+          totalSlots,
+          reservedSlots,
+          providerStatus,
+          parkingLotPicture,
+          parkingLotStatus,
+        } = _res.dataValues;
+        res.json({
+          id,
+          userId,
+          firstName,
+          lastName,
+          personalAddress,
+          parkingLotName,
+          parkingLotLocation,
+          vehicleType,
+          mobileNumber,
+          parkingPrice,
+          totalSlots,
+          reservedSlots,
+          providerStatus,
+          parkingLotPicture,
+          parkingLotStatus,
+        });
+      } else {
+        res.json(_res);
+      }
+
+      console.log(_res);
+    })
+    .catch((error) => console.log(error));
 });
 
 router.post("/searchparkinglot", (req, res) => {
@@ -224,7 +295,7 @@ router.post("/searchparkinglot", (req, res) => {
 
   Provider.findOne({ where: { id } })
 
-    .then(_res => {
+    .then((_res) => {
       if (_res) {
         let {
           id,
@@ -241,7 +312,7 @@ router.post("/searchparkinglot", (req, res) => {
           reservedSlots,
           providerStatus,
           parkingLotPicture,
-          parkingLotStatus
+          parkingLotStatus,
         } = _res.dataValues;
         res.json({
           id,
@@ -258,7 +329,7 @@ router.post("/searchparkinglot", (req, res) => {
           reservedSlots,
           providerStatus,
           parkingLotPicture,
-          parkingLotStatus
+          parkingLotStatus,
         });
       } else {
         res.json(_res);
@@ -266,7 +337,7 @@ router.post("/searchparkinglot", (req, res) => {
 
       console.log(_res);
     })
-    .catch(error => console.log(error));
+    .catch((error) => console.log(error));
 });
 
 router.post("/searchparking/:parkingLotLocation", (req, res) => {
@@ -277,15 +348,34 @@ router.post("/searchparking/:parkingLotLocation", (req, res) => {
   Provider.findAll({
     where: {
       parkingLotLocation: {
-        [Op.like]: "%" + parkingLotLocation + "%"
-      }
-    }
+        [Op.like]: "%" + parkingLotLocation + "%",
+      },
+    },
   })
-    .then(_res => {
+    .then((_res) => {
       res.json(_res);
       console.log(res);
     })
-    .catch(error => console.log(error));
+    .catch((error) => console.log(error));
+});
+
+router.post("/myparkinglots/:userId", (req, res) => {
+  console.log(req.params.userId);
+
+  const userId = req.params.userId;
+  console.log(userId);
+  Provider.findAll({
+    where: {
+      userId: {
+        [Op.like]: userId,
+      },
+    },
+  })
+    .then((_res) => {
+      res.json(_res);
+      console.log(res);
+    })
+    .catch((error) => console.log(error));
 });
 
 //Uploading Parking Pictures
@@ -300,14 +390,14 @@ router.post("/uploadParkingPict/:id", (req, res) => {
 
   parkingPictureFile.mv(
     `${__dirname}/../client/public/uploads/${randomFileName}.${splitFile[1]}`,
-    err => {
+    (err) => {
       if (err) {
         console.error(err);
         return res.status(500).send(err);
       }
       res.json({
         fileName: parkingPictureFile.name,
-        filePath: `/uploads/${randomFileName}.${splitFile[1]}`
+        filePath: `/uploads/${randomFileName}.${splitFile[1]}`,
       });
     }
   );

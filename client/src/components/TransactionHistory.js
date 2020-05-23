@@ -16,7 +16,7 @@ import {
   Form,
   FormGroup,
   Input,
-  Label
+  Label,
 } from "reactstrap";
 import logo from "./assets/parklogo.png";
 import Axios from "axios";
@@ -31,7 +31,7 @@ function TransactionHistory({ history }) {
     Axios.post(
       `http://localhost:8000/api/transactions/searchtransactions/${userData.id}`,
       {}
-    ).then(_res => {
+    ).then((_res) => {
       console.log(_res);
       let data = _res.data;
       transactionData = data;
@@ -44,7 +44,7 @@ function TransactionHistory({ history }) {
     console.log(transactionData);
   }, []);
 
-  const handleToHome = e => {
+  const handleToHome = (e) => {
     e.preventDefault();
     history.push("/home");
   };
@@ -75,7 +75,7 @@ function TransactionHistory({ history }) {
                               width: "50%",
                               border: "1px solid #ced4da",
                               borderRadius: "50%",
-                              marginBottom: 10
+                              marginBottom: 10,
                             }}
                           />
                         </CardSubtitle>
@@ -100,12 +100,13 @@ function TransactionHistory({ history }) {
                       <h5></h5>
                     </FormGroup>
                     <FormGroup>
-                      <button
-                        style={{ fontWeight: "bold" }}
+                      <Button
+                        className="mt-3"
+                        color="secondary"
                         onClick={handleToHome}
                       >
                         Home
-                      </button>
+                      </Button>
                     </FormGroup>
                   </Form>
                 </div>

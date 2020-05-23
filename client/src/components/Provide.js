@@ -16,7 +16,7 @@ import {
   Form,
   FormGroup,
   Input,
-  Label
+  Label,
 } from "reactstrap";
 import logo from "./assets/parklogo.png";
 import { UserContext } from "../context/UserContext";
@@ -25,10 +25,10 @@ function Provide({ history }) {
   let providerData = JSON.parse(localStorage.getItem("providerData"));
   console.log(providerData);
 
-  const handleNavigateToRegister = e => {
+  const handleNavigateToRegister = (e) => {
     e.preventDefault();
     if (providerData) {
-      history.push("/home");
+      history.push("/profile");
     } else {
       history.push("/parking-lot-registration");
     }
@@ -48,7 +48,9 @@ function Provide({ history }) {
                   <div className="mb-5">
                     <h5 style={{ fontWeight: "bold" }}>
                       {providerData
-                        ? "Your request is still being verified"
+                        ? providerData.providerStatus === "verified"
+                          ? "You are a verified parking provider"
+                          : "Your request is still being verified"
                         : "You are not a registered provider  "}
                     </h5>
                   </div>
@@ -64,9 +66,9 @@ function Provide({ history }) {
                       <button
                         type="login"
                         class="btnReg font-weight-bold"
-                        onClick={e => handleNavigateToRegister(e)}
+                        onClick={(e) => handleNavigateToRegister(e)}
                       >
-                        {providerData ? " Back" : " Register Here"}
+                        {providerData ? "Go To Profile" : " Register Here"}
                       </button>
                     </div>
                   </form>

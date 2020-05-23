@@ -16,7 +16,7 @@ import {
   Form,
   FormGroup,
   Input,
-  Label
+  Label,
 } from "reactstrap";
 import logo from "./assets/parklogo.png";
 import Axios from "axios";
@@ -24,22 +24,28 @@ import Axios from "axios";
 function ProvideParkingSpace({ history }) {
   let providerData = JSON.parse(localStorage.getItem("providerData"));
   let userData = JSON.parse(localStorage.getItem("userData"));
+  let parkingData = JSON.parse(localStorage.getItem("parkingData"));
   let [providerInfo, setProviderInfo] = useState([]);
 
   console.log("what?");
   console.log(userData);
 
-  const handleToProfile = e => {
+  const handleToProfile = (e) => {
     e.preventDefault();
-    history.push("/profile");
+    history.push("/my-parking-lots");
+  };
+
+  const handleToEdit = (e) => {
+    e.preventDefault();
+    history.push("/my-parking-space-update");
   };
 
   useEffect(() => {
-    Axios.post("http://localhost:8000/api/providers/searchprovider", {
-      userId: userData.id,
+    Axios.post("http://localhost:8000/api/providers/providerparkinglot", {
+      id: parkingData.id,
       firstName: userData.firstName,
-      lastName: userData.lastName
-    }).then(_res => {
+      lastName: userData.lastName,
+    }).then((_res) => {
       console.log(_res);
       let data = _res.data;
       providerInfo = data;
@@ -81,24 +87,29 @@ function ProvideParkingSpace({ history }) {
                             style={{
                               width: "100%",
                               border: "1px solid #ced4da",
-                              marginBottom: 10
+                              marginBottom: 10,
                             }}
                           />
                         </CardSubtitle>
 
                         <Label for="parkingPhoto">
-                          <h5 for="parkingPhoto">
+                          <h6 for="parkingPhoto">
                             {providerInfo.parkingLotLocation}
-                          </h5>{" "}
-                          Rate : Php
-                          {providerInfo.parkingPrice}/Hour
+                          </h6>
+                          <h6>
+                            Rate : Php
+                            {providerInfo.parkingPrice}/Hour
+                          </h6>
+                          <h6>Vehicle Type: {providerInfo.vehicleType}</h6>
                         </Label>
-                        <h5>Vehicle Type: {providerInfo.vehicleType}</h5>
                       </div>
                     </FormGroup>
                   </Form>
                 </div>
-                <h5 for="parkingPhoto">Call: {providerInfo.mobileNumber}</h5>
+                <h6 for="parkingPhoto" className="mt-3">
+                  Contact Number: {providerInfo.mobileNumber}
+                </h6>
+                <h6>Parking lot status: {providerInfo.parkingLotStatus}</h6>
                 <div className="col-md-12 registerBtn">
                   <div class=""></div>
                 </div>
@@ -106,13 +117,24 @@ function ProvideParkingSpace({ history }) {
               <div className="col-md-12 registerBtn">
                 <form>
                   <div class="">
-                    <button
-                      type="submit"
-                      class="btnSign font-weight-bold"
+                    <Button
+                      color="primary"
+                      className="mt-3"
+                      onClick={handleToEdit}
+                    >
+                      Edit Garage
+                    </Button>
+                  </div>
+                </form>
+                <form>
+                  <div class="">
+                    <Button
+                      color="secondary"
+                      className="mt-3"
                       onClick={handleToProfile}
                     >
-                      Back To Profile
-                    </button>
+                      Back
+                    </Button>
                   </div>
                 </form>
               </div>

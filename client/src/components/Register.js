@@ -15,7 +15,7 @@ import {
   Input,
   Label,
   FormFeedback,
-  FormText
+  FormText,
 } from "reactstrap";
 
 import { isEmpty, isEmail } from "validator";
@@ -23,13 +23,14 @@ import { isEmpty, isEmail } from "validator";
 import "./styles.css";
 import Axios from "axios";
 
-function Register() {
+function Register({ history }) {
   let [firstName, setFirstName] = useState("");
   let [email, setEmail] = useState("");
   let [lastName, setLastName] = useState("");
   let [contactNumber, setContactNUmber] = useState("");
   let [userName, setUserName] = useState("");
   let [password, setPassword] = useState("");
+  let [confirmPassword, setConfirmPassword] = useState("");
   let [profilePicture, setProfilePicture] = useState("");
   let [idFront, setIdFront] = useState("");
   let [idBack, setIdBack] = useState("");
@@ -60,16 +61,16 @@ function Register() {
 
   useEffect(() => {
     Axios.get("http://localhost:8000/api/users/get")
-      .then(_res => {
+      .then((_res) => {
         console.log(_res);
         let data = _res.data[0];
         console.log(data);
       })
-      .catch(error => console.log(error));
+      .catch((error) => console.log(error));
     console.log("what happend?");
   }, []);
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     let check = 0;
     console.log(contactNumber);
@@ -78,34 +79,57 @@ function Register() {
       setFirstNameErrorMessage("First name field is required");
       setFirstNameError(true);
       check = ++check;
+    } else {
+      setFirstNameError(false);
     }
 
     if (isEmpty(lastName)) {
       setLastNameErrorMessage("Lastname field is required");
       setLastNameError(true);
       check = ++check;
+    } else {
+      setLastNameError(false);
     }
 
     if (isEmpty(contactNumber)) {
       setContactNumberErrorMessage("Contact Number is required");
       setContactNumberError(true);
       check = ++check;
+    } else {
+      setContactNumberError(false);
     }
+
     if (isEmpty(email)) {
       setEmailErrorMessage("Email is required");
       setEmailError(true);
       check = ++check;
+    } else {
+      setEmailError(false);
     }
+
     if (isEmpty(userName)) {
       setUserNameErrorMessage("Username is required");
       setUserNameError(true);
       check = ++check;
+    } else {
+      setUserNameError(false);
     }
+
     if (isEmpty(password)) {
       setPasswordErrorMessage("Password is required");
       setPasswordError(true);
       check = ++check;
     }
+
+    if (password !== confirmPassword) {
+      setPasswordErrorMessage("password does not match");
+      setPasswordError(true);
+      check = ++check;
+    }
+    if (password === confirmPassword && !isEmpty(password)) {
+      setPasswordError(false);
+    }
+
     console.log(contactNumber);
     // Axios.get("link", { params: { firstName } });
     if (check === 0) {
@@ -120,9 +144,9 @@ function Register() {
         idFront,
         idBack,
         idWithSelfie,
-        userStatus
+        userStatus,
       })
-        .then(_res => {
+        .then((_res) => {
           console.log(_res);
           let data = _res.data;
 
@@ -131,13 +155,14 @@ function Register() {
           );
         })
 
-        .catch(error => console.log(error));
+        .catch((error) => console.log(error));
+      history.push("/login");
     } else {
       console.log("error");
     }
   };
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     e.preventDefault();
     if (e.currentTarget.name === "firstName") {
       setFirstName(e.currentTarget.value);
@@ -163,6 +188,9 @@ function Register() {
     if (e.currentTarget.name === "password") {
       setPassword(e.currentTarget.value);
     }
+    if (e.currentTarget.name === "confirmPassword") {
+      setConfirmPassword(e.currentTarget.value);
+    }
   };
 
   return (
@@ -180,7 +208,7 @@ function Register() {
                   <Form>
                     <FormGroup>
                       <Input
-                        onChange={e => handleChange(e)}
+                        onChange={(e) => handleChange(e)}
                         invalid={firstNameError}
                         type="text"
                         name="firstName"
@@ -197,7 +225,7 @@ function Register() {
                     </FormGroup>
                     <FormGroup>
                       <Input
-                        onChange={e => handleChange(e)}
+                        onChange={(e) => handleChange(e)}
                         invalid={lastNameError}
                         type="text"
                         name="lastName"
@@ -211,7 +239,7 @@ function Register() {
                     </FormGroup>
                     <FormGroup>
                       <Input
-                        onChange={e => handleChange(e)}
+                        onChange={(e) => handleChange(e)}
                         invalid={contactNumberError}
                         type="text"
                         name="contactNumber"
@@ -225,7 +253,7 @@ function Register() {
                     </FormGroup>
                     <FormGroup>
                       <Input
-                        onChange={e => handleChange(e)}
+                        onChange={(e) => handleChange(e)}
                         invalid={emailError}
                         type="text"
                         name="email"
@@ -239,7 +267,7 @@ function Register() {
                     </FormGroup>
                     <FormGroup>
                       <Input
-                        onChange={e => handleChange(e)}
+                        onChange={(e) => handleChange(e)}
                         invalid={userNameError}
                         type="text"
                         name="userName"
@@ -253,9 +281,9 @@ function Register() {
                     </FormGroup>
                     <FormGroup>
                       <Input
-                        onChange={e => handleChange(e)}
+                        onChange={(e) => handleChange(e)}
                         invalid={passwordError}
-                        type="text"
+                        type="password"
                         name="password"
                         id="password"
                         style={{ textAlign: "center", borderRadius: 10 }}
@@ -267,7 +295,8 @@ function Register() {
                     </FormGroup>
                     <FormGroup>
                       <Input
-                        type="text"
+                        onChange={(e) => handleChange(e)}
+                        type="password"
                         name="confirmPassword"
                         id="confirmPassword"
                         style={{ textAlign: "center", borderRadius: 10 }}
@@ -277,7 +306,7 @@ function Register() {
                   </Form>
                 </div>
                 <div className="col-md-12 registerBtn">
-                  <form onClick={e => handleSubmit(e)}>
+                  <form onClick={(e) => handleSubmit(e)}>
                     <div class="">
                       <button type="submit" class="btnSign font-weight-bold">
                         SIGN UP

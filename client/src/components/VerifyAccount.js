@@ -17,7 +17,7 @@ import {
   Form,
   FormGroup,
   Input,
-  Label
+  Label,
 } from "reactstrap";
 import { UserContext } from "../context/UserContext";
 import { isEmpty } from "validator";
@@ -37,7 +37,7 @@ function VerifyAccount({ history }) {
   );
   const [uploadedFileIdWithSelfie, setUploadedFileIdWithSelfie] = useState("");
 
-  const [userStatus, setUserStatus] = useState("");
+  let userStatus = "unverified";
 
   let userData = JSON.parse(localStorage.getItem("userData"));
   // let { setUserData } = UserContext(UserContext);
@@ -45,45 +45,12 @@ function VerifyAccount({ history }) {
   // console.log(uploadedFile, filename);
   // console.log(userData);
 
-  const handleToVerify = e => {
-    e.preventDefault();
-    setUserStatus("unverified");
-    let check = 0;
-    if (isEmpty(uploadedFileIdFront.filePath)) {
-      check++;
-    }
-    if (isEmpty(uploadedFileIdBack.filePath)) {
-      check++;
-    }
-    if (isEmpty(uploadedFileIdWithSelfie.filePath)) {
-      check++;
-    }
-
-    if (check === 0) {
-      Axios.post("http://localhost:8000/api/users/verificationRequest", {
-        id: userData.id,
-        idFront: uploadedFileIdFront.filePath,
-        idBack: uploadedFileIdBack.filePath,
-        idWithSelfie: uploadedFileIdWithSelfie.filePath,
-        userStatus: userStatus
-      }).then(_res => {
-        console.log(_res);
-        let data = _res.data;
-        console.log(data);
-      });
-      console.log();
-
-      history.push();
-    } else {
-    }
-  };
-
-  const onChangeIdFront = e => {
+  const onChangeIdFront = (e) => {
     setIdFrontFile(e.target.files[0]);
     setIdFrontFilename(e.target.files[0].name);
   };
 
-  const onChangeIdFrontSubmit = async e => {
+  const onChangeIdFrontSubmit = async (e) => {
     e.preventDefault();
     const idFrontData = new FormData();
     idFrontData.append("idFrontFile", idFrontFile);
@@ -94,8 +61,8 @@ function VerifyAccount({ history }) {
         idFrontData,
         {
           headers: {
-            "Content-Type": "mulifrom/form-data"
-          }
+            "Content-Type": "mulifrom/form-data",
+          },
         }
       );
       const { fileName, filePath } = res.data;
@@ -112,12 +79,12 @@ function VerifyAccount({ history }) {
     }
   };
 
-  const onChangeIdBack = e => {
+  const onChangeIdBack = (e) => {
     setIdBackFile(e.target.files[0]);
     setIdBackFilename(e.target.files[0].name);
   };
 
-  const onChangeIdBackSubmit = async e => {
+  const onChangeIdBackSubmit = async (e) => {
     e.preventDefault();
     const idBackData = new FormData();
     idBackData.append("idBackFile", idBackFile);
@@ -128,8 +95,8 @@ function VerifyAccount({ history }) {
         idBackData,
         {
           headers: {
-            "Content-Type": "mulifrom/form-data"
-          }
+            "Content-Type": "mulifrom/form-data",
+          },
         }
       );
       const { fileName, filePath } = res.data;
@@ -146,12 +113,12 @@ function VerifyAccount({ history }) {
     }
   };
 
-  const onChangeIdWithSelfie = e => {
+  const onChangeIdWithSelfie = (e) => {
     setIdWithSelfieFile(e.target.files[0]);
     setIdWithSelfieFilename(e.target.files[0].name);
   };
 
-  const onChangeIdWithSelfieSubmit = async e => {
+  const onChangeIdWithSelfieSubmit = async (e) => {
     e.preventDefault();
     const idWithSelfieData = new FormData();
     idWithSelfieData.append("idWithSelfieFile", idWithSelfieFile);
@@ -162,8 +129,8 @@ function VerifyAccount({ history }) {
         idWithSelfieData,
         {
           headers: {
-            "Content-Type": "mulifrom/form-data"
-          }
+            "Content-Type": "mulifrom/form-data",
+          },
         }
       );
       const { fileName, filePath } = res.data;
@@ -179,12 +146,58 @@ function VerifyAccount({ history }) {
       }
     }
   };
+  const handleToBack = (e) => {
+    history.push("/profile");
+  };
+
+  const handleToVerify = (e) => {
+    e.preventDefault();
+
+    let check = 0;
+    // if (isEmpty(uploadedFileIdFront.filePath)) {
+    //   check++;
+    // }
+    // if (isEmpty(uploadedFileIdBack.filePath)) {
+    //   check++;
+    // }
+    // if (isEmpty(uploadedFileIdWithSelfie.filePath)) {
+    //   check++;
+    // }
+    if (!uploadedFileIdFront) {
+      check++;
+    }
+    if (!uploadedFileIdBack) {
+      check++;
+    }
+    if (!uploadedFileIdWithSelfie) {
+      check++;
+    }
+
+    if (check === 0) {
+      Axios.post("http://localhost:8000/api/users/verificationRequest", {
+        id: userData.id,
+        idFront: uploadedFileIdFront.filePath,
+        idBack: uploadedFileIdBack.filePath,
+        idWithSelfie: uploadedFileIdWithSelfie.filePath,
+        userStatus: userStatus,
+      }).then((_res) => {
+        console.log(_res);
+        let data = _res.data;
+        console.log(data);
+      });
+      console.log();
+
+      history.push("/welcome");
+    } else {
+      console.log("incomplete pictures uploaded");
+    }
+  };
 
   return (
     <Container>
       <Row>
         <Col md={{ size: 5, offset: 3 }}>
-          <Card style={{ width: 400 }} className="shadow mt-2">
+          <Card style={{ width: 400 }} className="shadow mt-2 mb-3">
             <CardBody>
               <div className="row login-form">
                 <div className="col-md-12 signUpTitle">
@@ -210,7 +223,7 @@ function VerifyAccount({ history }) {
                             style={{
                               width: "50%",
                               border: "1px solid #ced4da",
-                              marginBottom: 10
+                              marginBottom: 10,
                             }}
                           />
                         </CardSubtitle>
@@ -220,9 +233,13 @@ function VerifyAccount({ history }) {
                           id="idFront"
                           onChange={onChangeIdFront}
                         />
-                        <button type="button" onClick={onChangeIdFrontSubmit}>
+                        <Button
+                          color="primary"
+                          type="button"
+                          onClick={onChangeIdFrontSubmit}
+                        >
                           Upload
-                        </button>
+                        </Button>
                       </div>
                     </FormGroup>
                     <FormGroup>
@@ -238,7 +255,7 @@ function VerifyAccount({ history }) {
                             style={{
                               width: "50%",
                               border: "1px solid #ced4da",
-                              marginBottom: 10
+                              marginBottom: 10,
                             }}
                           />
                         </CardSubtitle>
@@ -248,9 +265,13 @@ function VerifyAccount({ history }) {
                           id="idBack"
                           onChange={onChangeIdBack}
                         />
-                        <button type="button" onClick={onChangeIdBackSubmit}>
+                        <Button
+                          color="primary"
+                          type="button"
+                          onClick={onChangeIdBackSubmit}
+                        >
                           Upload
-                        </button>
+                        </Button>
                       </div>
                     </FormGroup>
                     <FormGroup>
@@ -266,7 +287,7 @@ function VerifyAccount({ history }) {
                             style={{
                               width: "50%",
                               border: "1px solid #ced4da",
-                              marginBottom: 10
+                              marginBottom: 10,
                             }}
                           />
                         </CardSubtitle>
@@ -276,12 +297,13 @@ function VerifyAccount({ history }) {
                           id="idWithSelfie"
                           onChange={onChangeIdWithSelfie}
                         />
-                        <button
+                        <Button
+                          color="primary"
                           type="button"
                           onClick={onChangeIdWithSelfieSubmit}
                         >
                           Upload
-                        </button>
+                        </Button>
                       </div>
                     </FormGroup>
                   </Form>
@@ -292,17 +314,23 @@ function VerifyAccount({ history }) {
                 </div>
               </div>
               <div className="col-md-12 registerBtn">
-                <form>
+                <Form>
                   <div class="">
-                    <button
+                    <Button
+                      color="success"
                       type="submit"
                       class="btnSign font-weight-bold"
                       onClick={handleToVerify}
                     >
                       Submit Pictures
-                    </button>
+                    </Button>
                   </div>
-                </form>
+                </Form>
+                <Form className="mt-2">
+                  <Button color="danger" onClick={handleToBack}>
+                    Cancel
+                  </Button>
+                </Form>
               </div>
             </CardBody>
           </Card>

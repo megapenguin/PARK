@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import "./styles.css";
 import noimageicon from "./assets/noimageicon.jpg";
 import axios from "axios";
@@ -17,7 +17,7 @@ import {
   Form,
   FormGroup,
   Input,
-  Label
+  Label,
 } from "reactstrap";
 import { UserContext } from "../context/UserContext";
 import Axios from "axios";
@@ -26,31 +26,41 @@ function Profile({ history }) {
   const [file, setFile] = useState("");
   const [filename, setFilename] = useState("Choose File");
   const [uploadedFile, setUploadedFile] = useState("");
+  let [newInfo, setNewInfo] = useState([]);
+  let [currentInfo, setCurrentInfo] = useState([]);
+  let [accName, setAccname] = useState("");
+  let [accId, setAccId] = useState("");
 
   let userData = JSON.parse(localStorage.getItem("userData"));
   let { setUserData } = useContext(UserContext);
 
   // console.log(uploadedFile, filename);
   // console.log(userData);
+  useEffect(() => {
+    setCurrentInfo(userData);
+    setAccId(userData.id);
+    setAccname(userData.userName);
+  }, []);
 
-  const onChange = e => {
+  const onChange = (e) => {
     setFile(e.target.files[0]);
     setFilename(e.target.files[0].name);
   };
 
-  const onSubmit = async e => {
+  const onSubmit = async (e) => {
     e.preventDefault();
+
     const profileData = new FormData();
     profileData.append("file", file);
 
     try {
       const res = await axios.post(
-        `http://localhost:8000/api/users/uploadProfilePict/${userData.id}`,
+        `http://localhost:8000/api/users/uploadProfilePict/${accId}`,
         profileData,
         {
           headers: {
-            "Content-Type": "mulifrom/form-data"
-          }
+            "Content-Type": "mulifrom/form-data",
+          },
         }
       );
       const { fileName, filePath } = res.data;
@@ -69,27 +79,37 @@ function Profile({ history }) {
     }
   };
 
-  const onSave = e => {
+  const onSave = (e) => {
     e.preventDefault();
+    let check = 0;
+    if (!uploadedFile) {
+      check++;
+    }
 
-    Axios.post("http://localhost:8000/api/users/updateProfile", {
-      id: userData.id,
-      profilePicture: uploadedFile.filePath
-    }).then(_res => {
-      console.log(_res);
-      let data = _res.data;
-      console.log(data);
-    });
-    console.log(uploadedFile.filePath);
+    if (check == 0) {
+      Axios.post("http://localhost:8000/api/users/updateProfile", {
+        id: accId,
+        profilePicture: uploadedFile.filePath,
+      }).then((_res) => {
+        console.log(_res);
+        let data = _res.data;
+        console.log(data);
+      });
+      console.log(uploadedFile.filePath);
+      history.push("/welcome");
+    } else {
+      console.log("no pictures uploaded");
+    }
+  };
 
+  const handleToBack = (e) => {
     Axios.post("http://localhost:8000/api/users/search", {
-      userName: userData.userName,
-      id: userData.id
-    }).then(_res => {
+      userName: accName,
+      id: accId,
+    }).then((_res) => {
       console.log(_res);
-
       let data = _res.data;
-
+      localStorage.clear();
       localStorage.setItem("userData", JSON.stringify(data));
     });
     history.push("/profile");
@@ -112,7 +132,7 @@ function Profile({ history }) {
                     <FormGroup>
                       <div className="text-center">
                         <h1 for="parkingPhoto" style={{ fontWeight: "bold" }}>
-                          {userData.firstName} {userData.lastName}
+                          {currentInfo.firstName} {currentInfo.lastName}
                         </h1>
                         <CardSubtitle>
                           <img
@@ -123,7 +143,7 @@ function Profile({ history }) {
                               width: "50%",
                               border: "1px solid #ced4da",
                               borderRadius: "50%",
-                              marginBottom: 10
+                              marginBottom: 10,
                             }}
                           />
                         </CardSubtitle>
@@ -136,13 +156,14 @@ function Profile({ history }) {
                       </div>
                     </FormGroup>
                   </Form>
-                  <button
+                  <Button
+                    color="primary"
                     type="button"
                     class="font-weight-bold"
                     onClick={onSubmit}
                   >
                     Upload
-                  </button>
+                  </Button>
                 </div>
 
                 <div className="col-md-12">
@@ -150,17 +171,19 @@ function Profile({ history }) {
                 </div>
               </div>
               <div className="col-md-12 registerBtn">
-                <form>
-                  <div class="">
-                    <button
-                      type="submit"
-                      class="btnSign font-weight-bold"
-                      onClick={onSave}
-                    >
-                      Save
-                    </button>
-                  </div>
-                </form>
+                <Form>
+                  <Row>
+                    <Col>
+                      <Button color="success" type="submit" onClick={onSave}>
+                        Save
+                      </Button>
+                      {"   "}
+                      <Button color="danger" onClick={handleToBack}>
+                        Cancel
+                      </Button>
+                    </Col>
+                  </Row>
+                </Form>
               </div>
             </CardBody>
           </Card>

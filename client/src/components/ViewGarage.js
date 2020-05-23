@@ -16,7 +16,7 @@ import {
   Form,
   FormGroup,
   Input,
-  Label
+  Label,
 } from "reactstrap";
 import { isEmpty } from "validator";
 import Axios from "axios";
@@ -30,8 +30,8 @@ function ViewGarage({ history }) {
 
   useEffect(() => {
     Axios.post("http://localhost:8000/api/providers/searchparkinglot", {
-      id: parkingData.id
-    }).then(_res => {
+      id: parkingData.id,
+    }).then((_res) => {
       console.log(_res);
       let data = _res.data;
       parkingInfo = data;
@@ -48,14 +48,21 @@ function ViewGarage({ history }) {
   console.log(parkingData);
   console.log(garagePicture);
 
-  const searchParking = e => {
+  const searchParking = (e) => {
     e.preventDefault();
     console.log();
   };
 
-  const handleToPark = e => {
+  const handleToPark = (e) => {
     e.preventDefault();
-    history.push("/parking-request");
+    if (
+      parkingInfo.totalSlots == parkingInfo.reservedSlots ||
+      parkingInfo.parkingLotStatus == "notavailable"
+    ) {
+      history.push("/search-parking-lot");
+    } else {
+      history.push("/parking-request");
+    }
   };
 
   return (
@@ -83,7 +90,7 @@ function ViewGarage({ history }) {
                             style={{
                               width: "100%",
                               border: "1px solid #ced4da",
-                              marginBottom: 10
+                              marginBottom: 10,
                             }}
                           />
                         </CardSubtitle>
@@ -113,7 +120,10 @@ function ViewGarage({ history }) {
                       class="btnSign font-weight-bold"
                       onClick={handleToPark}
                     >
-                      Park Here
+                      {parkingInfo.totalSlots == parkingInfo.reservedSlots ||
+                      parkingInfo.parkingLotStatus == "notavailable"
+                        ? "Not Available"
+                        : "Park Here"}
                     </button>
                   </div>
                 </form>

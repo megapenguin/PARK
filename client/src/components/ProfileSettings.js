@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import noimageicon from "./assets/noimageicon.jpg";
+import UpdateRequest from "./layouts/UpdateRequest";
 import "./styles.css";
 
 import {
@@ -16,7 +17,7 @@ import {
   Form,
   FormGroup,
   Input,
-  Label
+  Label,
 } from "reactstrap";
 import logo from "./assets/parklogo.png";
 import Axios from "axios";
@@ -28,13 +29,50 @@ function ProfileSettings({ history }) {
   let frontId = userData.idFront;
   let backId = userData.idBack;
   let idWithSelfie = userData.idWithSelfie;
+  let [update, setUpdate] = useState("");
+  let [refresh, setRefresh] = useState(false);
+
+  useEffect(() => {
+    console.log(refresh);
+    Axios.post("http://localhost:8000/api/updates/find", {
+      userId: userData.id,
+    })
+      .then((_res) => {
+        console.log(_res);
+
+        let data = _res.data;
+        console.log(data);
+        if (data) {
+          console.log("succes");
+          setUpdate(true);
+        } else {
+          console.log("null");
+          setUpdate(false);
+        }
+      })
+      .catch((error) => console.log(error));
+  }, [refresh]);
+
+  // useEffect(() => {
+  //   Axios.post("http://localhost:8000/api/updates/insert", {
+  //     userId: userData.id,
+  //     firstName: userData.firstName,
+  //     lastName: userData.lastName,
+  //     contactNumber: userData.contactNumber,
+  //     email: userData.email,
+  //   }).then((_res) => {
+  //     console.log(_res.data);
+  //     let data = _res.data;
+  //     console.log("Success");
+  //   });
+  // }, []);
 
   console.log(frontId);
   console.log(currentProfile);
 
-  const handleToHome = e => {
+  const handleToBack = (e) => {
     e.preventDefault();
-    history.push("/home");
+    history.push("/profile");
   };
 
   return (
@@ -64,41 +102,75 @@ function ProfileSettings({ history }) {
                               width: "50%",
                               border: "1px solid #ced4da",
                               borderRadius: "50%",
-                              marginBottom: 10
+                              marginBottom: 10,
                             }}
                           />
                         </CardSubtitle>
 
                         <Label>
-                          <p style={{ fontWeight: "bold" }}>
-                            {userData.id} : {userData.userName}
-                          </p>
-                          <p className="mt-3">
-                            {" "}
-                            <input
-                              style={{
-                                fontWeight: "bold",
-                                border: "hidden"
-                              }}
-                              placeholder={userData.firstName}
-                            ></input>{" "}
-                            <input
-                              style={{
-                                fontWeight: "bold",
-                                border: "hidden"
-                              }}
-                              placeholder={userData.lastName}
-                            ></input>{" "}
-                            <input
-                              style={{
-                                fontWeight: "bold",
-                                border: "hidden"
-                              }}
-                              placeholder={userData.contactNumber}
-                            ></input>
-                          </p>
+                          <h6 style={{ fontWeight: "bold" }}>
+                            User ID : {userData.id}
+                          </h6>
+                          <h6 style={{ fontWeight: "bold" }}>
+                            Username : {userData.userName}
+                          </h6>
+                          <h6 className="mt-3">
+                            <Row>
+                              {" "}
+                              Firstname :{" "}
+                              <input
+                                style={{
+                                  fontWeight: "bold",
+                                  border: "hidden",
+                                }}
+                                value={userData.firstName}
+                              ></input>
+                            </Row>
+                            <Row>
+                              Lastname :{" "}
+                              <input
+                                style={{
+                                  fontWeight: "bold",
+                                  border: "hidden",
+                                }}
+                                value={userData.lastName}
+                              ></input>
+                            </Row>
+                            <Row>
+                              Contact Number :{" "}
+                              <input
+                                style={{
+                                  fontWeight: "bold",
+                                  border: "hidden",
+                                }}
+                                value={userData.contactNumber}
+                              ></input>
+                            </Row>
+                            <Row>
+                              Email Address :{" "}
+                              <input
+                                style={{
+                                  fontWeight: "bold",
+                                  border: "hidden",
+                                }}
+                                value={userData.email}
+                              ></input>
+                            </Row>
+                          </h6>
+                          <Row>
+                            {update == true ? (
+                              "Update Waiting"
+                            ) : (
+                              <UpdateRequest
+                                buttonLabel={"Request Update"}
+                                requestInfo={userData}
+                                value={refresh}
+                                clickValue={setRefresh}
+                              />
+                            )}
+                          </Row>
                         </Label>
-                        <CardSubtitle>
+                        <CardSubtitle className="mt-2">
                           <h5 style={{ fontWeight: "bold" }}>ID Pictures</h5>
                           <img
                             src={frontId ? frontId : noimageicon}
@@ -106,7 +178,7 @@ function ProfileSettings({ history }) {
                               width: "50%",
                               border: "1px solid #ced4da",
 
-                              marginBottom: 10
+                              marginBottom: 10,
                             }}
                           />
                         </CardSubtitle>
@@ -117,7 +189,7 @@ function ProfileSettings({ history }) {
                               width: "50%",
                               border: "1px solid #ced4da",
 
-                              marginBottom: 10
+                              marginBottom: 10,
                             }}
                           />
                         </CardSubtitle>
@@ -128,16 +200,18 @@ function ProfileSettings({ history }) {
                               width: "50%",
                               border: "1px solid #ced4da",
 
-                              marginBottom: 10
+                              marginBottom: 10,
                             }}
                           />
                         </CardSubtitle>
-                        <button
+                        <Button
+                          className="mt-2"
+                          color="secondary"
                           style={{ fontWeight: "bold" }}
-                          onClick={handleToHome}
+                          onClick={handleToBack}
                         >
-                          Home
-                        </button>
+                          Back
+                        </Button>
                       </div>
                     </FormGroup>
                   </Form>

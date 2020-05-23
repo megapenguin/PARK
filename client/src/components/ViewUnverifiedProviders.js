@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import noimageicon from "./assets/noimageicon.jpg";
+import Sidebar from "./layouts/Sidebar";
 import parklogo from "./assets/parklogo.png";
 import {
   Table,
@@ -10,7 +11,7 @@ import {
   FormGroup,
   CardImg,
   Form,
-  Label
+  Label,
 } from "reactstrap";
 import { Row, Col, Container } from "reactstrap";
 import NavBar from "./layouts/NavBar";
@@ -36,29 +37,46 @@ function ViewUnverifiedProviders() {
   let [vehicleCapacity, setVehicleCapacity] = useState("");
   let [parkingPrice, setParkingPrice] = useState("");
   let [providerStatus, setProviderStatus] = useState("");
+  let [refreshInfo, setRefreshInfo] = useState(false);
+  let [refreshTable, setRefreshTable] = useState(false);
 
   console.log(providerStatus);
 
   useEffect(() => {
     setProviderStatus("verified");
     Axios.get("http://localhost:8000/api/providers/getunverifiedproviders")
-      .then(_res => {
+      .then((_res) => {
         console.log(_res);
         let data = _res.data;
         searchResult = data;
         setSearchResult(searchResult);
         console.log(searchResult);
       })
-      .catch(error => console.log(error));
+      .catch((error) => console.log(error));
     console.log("what happend?");
-  }, []);
+  }, [refreshTable]);
 
-  const handleOnSelect = index => {
+  useEffect(() => {
+    setProviderStatus("verified");
+    Axios.get("http://localhost:8000/api/providers/getunverifiedproviders")
+      .then((_res) => {
+        console.log(_res);
+        let data = _res.data;
+        searchResult = data;
+        setSearchResult(searchResult);
+        console.log(searchResult);
+      })
+      .catch((error) => console.log(error));
+    console.log("what happend?");
+  }, [refreshTable]);
+
+  const handleOnSelect = (index) => {
     console.log(index);
-
+    setRefreshInfo(true);
+    setRefreshTable(false);
     Axios.post("http://localhost:8000/api/users/userprofilepicture", {
-      id: searchResult[index].userId
-    }).then(_res => {
+      id: searchResult[index].userId,
+    }).then((_res) => {
       console.log(_res);
       let data = _res.data;
       userProfile = data;
@@ -84,8 +102,9 @@ function ViewUnverifiedProviders() {
     console.log(parkingLotLocation);
   };
 
-  const handleOnChange = e => {
+  const handleOnChange = (e) => {
     e.preventDefault();
+    setRefreshTable(!refreshTable);
     if (e.currentTarget.name === "vehicletype") {
       setVehicleType(e.currentTarget.value);
       console.log(vehicleType);
@@ -118,9 +137,10 @@ function ViewUnverifiedProviders() {
     }
   };
 
-  const handleToApprove = e => {
+  const handleToApprove = (e) => {
     e.preventDefault();
-
+    setRefreshInfo(false);
+    setRefreshTable(true);
     Axios.post("http://localhost:8000/api/providers/updateprovider", {
       id: providerId,
       firstName: firstName,
@@ -130,22 +150,38 @@ function ViewUnverifiedProviders() {
       parkingPrice: parkingPrice,
       totalSlots: vehicleCapacity,
       parkingLotStatus: parkingLotStatus,
-      providerStatus: providerStatus
-    }).then(_res => {
+      providerStatus: providerStatus,
+    }).then((_res) => {
       console.log(_res);
       let data = _res.data;
       userProfile = data;
       setUserProfile(userProfile);
+      setRefreshTable(true);
     });
+
+    Axios.get("http://localhost:8000/api/providers/getunverifiedproviders")
+      .then((_res) => {
+        console.log(_res);
+        let data = _res.data;
+        searchResult = data;
+        setSearchResult(searchResult);
+        console.log(searchResult);
+        setRefreshTable(true);
+      })
+      .catch((error) => console.log(error));
+    console.log("what happend?");
+    setRefreshTable(true);
   };
 
   return (
     <React.Fragment>
+      <Sidebar />
       <Row>
         <Col className="mb-5">
           <NavBar />
         </Col>
       </Row>
+
       <Container className="mt-6">
         <Row className="mt-5">
           <Col sm="12" md={{ size: 6, offset: 3 }}>
@@ -165,21 +201,22 @@ function ViewUnverifiedProviders() {
                   className="mt-3"
                   style={{
                     textAlign: "center",
-                    width: 525,
-                    border: "hidden"
+                    border: "hidden",
                   }}
                 >
-                  <tr>
-                    <th>ID</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                  </tr>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                    </tr>
+                  </thead>
                 </Table>
                 <Table hover responsive>
                   <tbody>
                     {searchResult.length !== 0
                       ? searchResult.map((info, index) => (
-                          <tr id={index} onClick={e => handleOnSelect(index)}>
+                          <tr id={index} onClick={(e) => handleOnSelect(index)}>
                             <th scope="row">{info.id}</th>
                             <td>{info.firstName}</td>
                             <td>{info.lastName}</td>
@@ -198,21 +235,26 @@ function ViewUnverifiedProviders() {
                 <CardTitle>
                   <img
                     id="garagepicture"
-                    src={parkingLotPicture ? parkingLotPicture : noimageicon}
+                    src={refreshInfo === true ? parkingLotPicture : noimageicon}
                     style={{
                       height: 200,
                       width: 250,
-                      border: "1px solid black"
+                      border: "1px solid black",
                     }}
                   ></img>{" "}
                 </CardTitle>
                 <Label for="garagepicture">
-                  <h5>{parkingLotName ? parkingLotName : "Parkinglot Name"}</h5>
+                  <h5>
+                    {refreshInfo === true ? parkingLotName : "Parkinglot Name"}
+                  </h5>
                 </Label>
                 <CardBody>
                   <Form>
                     <FormGroup row>
-                      <Label for="vehicletype">Vehicle Type : </Label>
+                      <Col>
+                        <Label for="vehicletype">Vehicle Type : </Label>
+                      </Col>
+
                       <Col sm={8}>
                         {" "}
                         <Input
@@ -221,14 +263,17 @@ function ViewUnverifiedProviders() {
                           id="vehicletype"
                           onChange={handleOnChange}
                           style={{ textAlign: "center", borderRadius: 10 }}
-                          placeholder={
-                            vehicleType ? vehicleType : "Vehicle Type"
+                          value={
+                            refreshInfo === true ? vehicleType : "Vehicle Type"
                           }
                         />
                       </Col>
                     </FormGroup>
                     <FormGroup row>
-                      <Label for="vehiclecapacity">Vehicle Capacity :</Label>
+                      <Col>
+                        <Label for="vehiclecapacity">Vehicle Capacity :</Label>
+                      </Col>
+
                       <Col sm={8}>
                         <Input
                           type="text"
@@ -236,8 +281,8 @@ function ViewUnverifiedProviders() {
                           id="vehiclecapacity"
                           onChange={handleOnChange}
                           style={{ textAlign: "center", borderRadius: 10 }}
-                          placeholder={
-                            vehicleCapacity
+                          value={
+                            refreshInfo === true
                               ? vehicleCapacity
                               : "Vehicle Capacity"
                           }
@@ -245,7 +290,12 @@ function ViewUnverifiedProviders() {
                       </Col>
                     </FormGroup>
                     <FormGroup row>
-                      <Label for="parkingprice">Parking Price :</Label>
+                      <Col>
+                        <Label for="parkingprice">
+                          Parking Price per Hour:
+                        </Label>
+                      </Col>
+
                       <Col sm={8}>
                         <Input
                           type="text"
@@ -253,9 +303,9 @@ function ViewUnverifiedProviders() {
                           id="parkingprice"
                           onChange={handleOnChange}
                           style={{ textAlign: "center", borderRadius: 10 }}
-                          placeholder={
-                            parkingPrice
-                              ? `${parkingPrice}/Hour`
+                          value={
+                            refreshInfo === true
+                              ? parkingPrice
                               : "Parking Price"
                           }
                         />
@@ -270,16 +320,16 @@ function ViewUnverifiedProviders() {
       </Container>
       <Row>
         <Container>
-          <h2 className="mt-5">Provider Information</h2>
+          <h2 className="mt-2">Provider Information</h2>
           <Card style={{ border: "hidden" }}>
-            <CardTitle className="mt-5">
+            <CardTitle className="mt-2">
               <img
                 id="profilepicture"
-                src={profilePicture ? profilePicture : noimageicon}
+                src={refreshInfo === true ? profilePicture : noimageicon}
                 style={{
                   height: 150,
                   width: 150,
-                  border: "1px solid black"
+                  border: "1px solid black",
                 }}
               ></img>{" "}
             </CardTitle>
@@ -289,7 +339,11 @@ function ViewUnverifiedProviders() {
                   <Col md={6}>
                     <FormGroup>
                       <Label>
-                        <h5>{userId ? `User ID : ${userId}` : "User ID"}</h5>
+                        <h5>
+                          {refreshInfo === true
+                            ? `User ID : ${userId}`
+                            : "User ID"}
+                        </h5>
                       </Label>
                     </FormGroup>
                   </Col>
@@ -298,7 +352,7 @@ function ViewUnverifiedProviders() {
                       <Label>
                         <h5>
                           {" "}
-                          {providerId
+                          {refreshInfo === true
                             ? `Provider Id : ${providerId}`
                             : "Provider ID"}
                         </h5>
@@ -314,7 +368,7 @@ function ViewUnverifiedProviders() {
                         id="firstName"
                         onChange={handleOnChange}
                         style={{ textAlign: "center", borderRadius: 10 }}
-                        placeholder={firstName ? firstName : "Firstname"}
+                        value={refreshInfo === true ? firstName : "Firstname"}
                       />
                     </FormGroup>
                   </Col>
@@ -327,7 +381,7 @@ function ViewUnverifiedProviders() {
                         id="lastname"
                         onChange={handleOnChange}
                         style={{ textAlign: "center", borderRadius: 10 }}
-                        placeholder={lastName ? lastName : "Lastname"}
+                        value={refreshInfo === true ? lastName : "Lastname"}
                       />
                     </FormGroup>
                   </Col>
@@ -340,8 +394,8 @@ function ViewUnverifiedProviders() {
                         id="contactnumber"
                         onChange={handleOnChange}
                         style={{ textAlign: "center", borderRadius: 10 }}
-                        placeholder={
-                          contactNumber ? contactNumber : "Contactnumber"
+                        value={
+                          refreshInfo === true ? contactNumber : "Contactnumber"
                         }
                       />
                     </FormGroup>
@@ -355,8 +409,8 @@ function ViewUnverifiedProviders() {
                         id="parkinglotstatus"
                         onChange={handleOnChange}
                         style={{ textAlign: "center", borderRadius: 10 }}
-                        placeholder={
-                          parkingLotStatus
+                        value={
+                          refreshInfo === true
                             ? parkingLotStatus
                             : "Parkinglot Status"
                         }
@@ -372,8 +426,8 @@ function ViewUnverifiedProviders() {
                         id="parkinglotaddress"
                         onChange={handleOnChange}
                         style={{ textAlign: "center", borderRadius: 10 }}
-                        placeholder={
-                          parkingLotLocation
+                        value={
+                          refreshInfo === true
                             ? parkingLotLocation
                             : "Parkinglot Address"
                         }
@@ -391,8 +445,10 @@ function ViewUnverifiedProviders() {
                         id="personaladdress"
                         onChange={handleOnChange}
                         style={{ textAlign: "center", borderRadius: 10 }}
-                        placeholder={
-                          personalAddress ? personalAddress : "Personal Address"
+                        value={
+                          refreshInfo === true
+                            ? personalAddress
+                            : "Personal Address"
                         }
                       />
                     </FormGroup>

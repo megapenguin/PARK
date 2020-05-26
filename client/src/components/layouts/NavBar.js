@@ -19,6 +19,9 @@ import {
 
 function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
+  const clear = (e) => {
+    localStorage.clear();
+  };
 
   const toggle = () => setIsOpen(!isOpen);
   return (
@@ -97,7 +100,9 @@ function NavBar() {
           </UncontrolledDropdown>
 
           <NavLink href="/welcome">
-            <ButtonToggle color="danger">Log Out</ButtonToggle>
+            <ButtonToggle color="danger" onClick={(e) => clear(e)}>
+              Log Out
+            </ButtonToggle>
           </NavLink>
         </Nav>
       </Collapse>

@@ -26,12 +26,14 @@ import logo from "./assets/parklogo.png";
 import Axios from "axios";
 import { isEmpty } from "validator";
 import { ProviderContext } from "../context/ProviderContext";
+import { withRouter } from "react-router-dom";
 
-function SendRequest({ history }) {
+function SendRequest({ history, Auth }) {
   let parkingData = JSON.parse(localStorage.getItem("parkingData"));
-  let userData = JSON.parse(localStorage.getItem("userData"));
+  //let Auth.state.userData = JSON.parse(localStorage.getItem("Auth.state.userData"));
   let [parkingInfo, setParkingInfo] = useState([]);
   let [vehiclePlatenumber, setVehiclePlatenumber] = useState("");
+  let [slots, setSlots] = useState("");
   let parkingStart = "00:00:00";
   let parkingEnd = "00:00:00";
   let newDate = new Date();
@@ -55,6 +57,7 @@ function SendRequest({ history }) {
       console.log(parkingInfo);
     });
     console.log("what");
+    setSlots(parkingInfo.reservedSlots++);
     console.log(parkingInfo);
   }, []);
 
@@ -72,15 +75,26 @@ function SendRequest({ history }) {
 
   const SendRequest = (e) => {
     e.preventDefault();
-    console.log();
+    console.log(slots);
     let check = 0;
     if (isEmpty(vehiclePlatenumber)) {
       check++;
     }
     if (check === 0) {
+      Axios.post("http://localhost:8000/api/providers/reservedslot", {
+        id: parkingInfo.id,
+        userId: parkingInfo.userId,
+        reservedSlots: parkingInfo.reservedSlots + 1,
+
+        // requestedAt: requestTime
+      }).then((_res) => {
+        console.log(_res);
+        let data = _res.data;
+      });
+
       Axios.post("http://localhost:8000/api/transactions/inserttransaction", {
         providerId: parkingData.id,
-        userId: userData.id,
+        userId: Auth.state.userData.id,
         vehiclePlatenumber,
         parkingStart: parkingStart,
         parkingEnd: parkingEnd,
@@ -155,4 +169,4 @@ function SendRequest({ history }) {
   );
 }
 
-export default SendRequest;
+export default withRouter(SendRequest);

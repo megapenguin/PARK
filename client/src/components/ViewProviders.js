@@ -51,7 +51,7 @@ function ViewProviders() {
       })
       .catch((error) => console.log(error));
     console.log("what happend?");
-  }, [refreshTable]);
+  }, [refreshTable, refreshInfo]);
 
   const handleOnSelect = (index) => {
     console.log(index);
@@ -192,6 +192,19 @@ function ViewProviders() {
         console.log(searchResult);
       });
     }
+  };
+
+  const handleToDelete = (e) => {
+    console.log(userId);
+    Axios.post("http://localhost:8000/api/providers/delete", {
+      id: providerId,
+    }).then((_res) => {
+      console.log(_res);
+      let data = _res.data;
+      console.log("success delete");
+    });
+    setRefreshTable(!refreshTable);
+    setRefreshInfo(false);
   };
 
   return (
@@ -496,10 +509,12 @@ function ViewProviders() {
                   </Col>
                 </Row>
               </Form>
-              <Button color="success" onClick={handleToApprove}>
+              <Button color="success" onClick={(e) => handleToApprove(e)}>
                 Update
               </Button>{" "}
-              <Button color="danger">Decline</Button>{" "}
+              <Button color="danger" onClick={(e) => handleToDelete(e)}>
+                Delete
+              </Button>{" "}
             </CardBody>
           </Card>
         </Container>

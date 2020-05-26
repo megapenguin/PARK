@@ -23,9 +23,10 @@ import {
 } from "reactstrap";
 import { TransactionContext } from "../context/TransactionContext";
 import Axios from "axios";
+import { withRouter } from "react-router-dom";
 
-function MainProfile({ history }) {
-  let userData = JSON.parse(localStorage.getItem("userData"));
+function MainProfile({ history, Auth }) {
+  //let Auth.state.userData = JSON.parse(localStorage.getItem("Auth.state.userData"));
   let providerData = JSON.parse(localStorage.getItem("providerData"));
   let { setTransactionData } = useContext(TransactionContext);
   let [error, setError] = useState("");
@@ -50,8 +51,8 @@ function MainProfile({ history }) {
 
   useEffect(() => {
     Axios.post("http://localhost:8000/api/users/search", {
-      id: userData.id,
-      userName: userData.userName,
+      id: Auth.state.userData.id,
+      userName: Auth.state.userData.userName,
     }).then((_res) => {
       console.log(_res);
       let data = _res.data;
@@ -62,8 +63,8 @@ function MainProfile({ history }) {
     });
   }, []);
 
-  console.log(userData.profilePicture);
-  let currentProfile = userData.profilePicture;
+  console.log(Auth.state.userData.profilePicture);
+  let currentProfile = currentUser.profilePicture;
 
   const handleToProfile = (e) => {
     e.preventDefault();
@@ -72,7 +73,7 @@ function MainProfile({ history }) {
 
   const handleToVerify = (e) => {
     e.preventDefault();
-    if (userData.userStatus === "unverified") {
+    if (currentUser.userStatus === "unverified") {
     } else {
       history.push("/verify-profile");
     }
@@ -117,7 +118,7 @@ function MainProfile({ history }) {
                     <FormGroup>
                       <div className="text-center">
                         <h1 style={{ fontWeight: "bold" }}>
-                          {userData.firstName} {userData.lastName}
+                          {currentUser.firstName} {currentUser.lastName}
                         </h1>
                         <CardSubtitle>
                           <img
@@ -141,11 +142,11 @@ function MainProfile({ history }) {
                           id="userprofile"
                           style={{ fontWeight: "bold", color: "#bf4bdc" }}
                         >
-                          {userData.userName}
+                          {currentUser.userName}
                         </h1>
 
                         <Label for="userprofile">
-                          {userData.userStatus === "verified" ? (
+                          {currentUser.userStatus === "verified" ? (
                             <h5>Verified</h5>
                           ) : (
                             <h5
@@ -153,7 +154,7 @@ function MainProfile({ history }) {
                               style={{ color: "#2acfe0" }}
                               onClick={(e) => handleToVerify(e)}
                             >
-                              {userData.userStatus === "unverified"
+                              {currentUser.userStatus === "unverified"
                                 ? "Waiting for verification"
                                 : "Verify your account"}
                             </h5>
@@ -204,4 +205,4 @@ function MainProfile({ history }) {
   );
 }
 
-export default MainProfile;
+export default withRouter(MainProfile);

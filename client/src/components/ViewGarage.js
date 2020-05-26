@@ -21,6 +21,7 @@ import {
 import { isEmpty } from "validator";
 import Axios from "axios";
 import { ParkingContext } from "../context/ParkingContext";
+import { withRouter } from "react-router-dom";
 
 function ViewGarage({ history }) {
   let parkingData = JSON.parse(localStorage.getItem("parkingData"));
@@ -136,4 +137,4 @@ function ViewGarage({ history }) {
   );
 }
 
-export default ViewGarage;
+export default withRouter(ViewGarage);

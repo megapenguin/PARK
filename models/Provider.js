@@ -6,72 +6,72 @@ const Provider = db.define("providers", {
     type: Sequelize.INTEGER,
     autoIncrement: true,
     primaryKey: true,
-    allowNull: false
+    allowNull: false,
   },
   userId: {
     type: Sequelize.INTEGER,
-    allowNull: false
+    allowNull: false,
   },
   firstName: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   lastName: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   personalAddress: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   parkingLotName: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   parkingLotLocation: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   vehicleType: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   mobileNumber: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   parkingPrice: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   totalSlots: {
-    type: Sequelize.STRING,
-    allowNull: false
+    type: Sequelize.INTEGER,
+    allowNull: false,
   },
   reservedSlots: {
-    type: Sequelize.STRING,
-    allowNull: false
+    type: Sequelize.INTEGER,
+    allowNull: false,
   },
   providerStatus: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   parkingLotPicture: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   parkingLotStatus: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   createdAt: {
     type: Sequelize.DATE,
-    allowNull: false
+    allowNull: false,
   },
   updatedAt: {
     type: Sequelize.DATE,
-    allowNull: false
-  }
+    allowNull: false,
+  },
 });
 
 module.exports = Provider;

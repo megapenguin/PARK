@@ -22,6 +22,7 @@ import { isEmpty, isEmail } from "validator";
 
 import "./styles.css";
 import Axios from "axios";
+import { withRouter } from "react-router-dom";
 
 function Register({ history }) {
   let [firstName, setFirstName] = useState("");
@@ -133,7 +134,7 @@ function Register({ history }) {
     console.log(contactNumber);
     // Axios.get("link", { params: { firstName } });
     if (check === 0) {
-      Axios.post("http://localhost:8000/api/users/insert", {
+      Axios.post("http://localhost:8000/api/users/register", {
         firstName,
         lastName,
         contactNumber,
@@ -323,4 +324,4 @@ function Register({ history }) {
   );
 }
 
-export default Register;
+export default withRouter(Register);

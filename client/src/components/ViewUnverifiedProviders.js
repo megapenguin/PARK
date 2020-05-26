@@ -54,7 +54,7 @@ function ViewUnverifiedProviders() {
       })
       .catch((error) => console.log(error));
     console.log("what happend?");
-  }, [refreshTable]);
+  }, [refreshTable, refreshInfo]);
 
   useEffect(() => {
     setProviderStatus("verified");
@@ -171,6 +171,18 @@ function ViewUnverifiedProviders() {
       .catch((error) => console.log(error));
     console.log("what happend?");
     setRefreshTable(true);
+  };
+  const handleToDelete = (e) => {
+    console.log(userId);
+    Axios.post("http://localhost:8000/api/providers/delete", {
+      id: providerId,
+    }).then((_res) => {
+      console.log(_res);
+      let data = _res.data;
+      console.log("success delete");
+    });
+    setRefreshTable(!refreshTable);
+    setRefreshInfo(false);
   };
 
   return (
@@ -455,10 +467,12 @@ function ViewUnverifiedProviders() {
                   </Col>
                 </Row>
               </Form>
-              <Button color="success" onClick={handleToApprove}>
+              <Button color="success" onClick={(e) => handleToApprove(e)}>
                 Approve
               </Button>{" "}
-              <Button color="danger">Decline</Button>{" "}
+              <Button color="danger" onClick={(e) => handleToDelete(e)}>
+                Decline
+              </Button>{" "}
             </CardBody>
           </Card>
         </Container>

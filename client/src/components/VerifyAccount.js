@@ -22,7 +22,8 @@ import {
 import { UserContext } from "../context/UserContext";
 import { isEmpty } from "validator";
 import Axios from "axios";
-function VerifyAccount({ history }) {
+import { withRouter } from "react-router-dom";
+function VerifyAccount({ history, Auth }) {
   const [idFrontFile, setIdFrontFile] = useState("");
   const [idFrontFilename, setIdFrontFilename] = useState("Choose File");
   const [uploadedFileIdFront, setUploadedFileIdFront] = useState("");
@@ -39,11 +40,11 @@ function VerifyAccount({ history }) {
 
   let userStatus = "unverified";
 
-  let userData = JSON.parse(localStorage.getItem("userData"));
+  //let Auth.state.userData = JSON.parse(localStorage.getItem("Auth.state.userData"));
   // let { setUserData } = UserContext(UserContext);
 
   // console.log(uploadedFile, filename);
-  // console.log(userData);
+  // console.log(Auth.state.userData);
 
   const onChangeIdFront = (e) => {
     setIdFrontFile(e.target.files[0]);
@@ -57,7 +58,7 @@ function VerifyAccount({ history }) {
 
     try {
       const res = await axios.post(
-        `http://localhost:8000/api/users/uploadidfront/${userData.id}`,
+        `http://localhost:8000/api/users/uploadidfront/${Auth.state.userData.id}`,
         idFrontData,
         {
           headers: {
@@ -91,7 +92,7 @@ function VerifyAccount({ history }) {
 
     try {
       const res = await axios.post(
-        `http://localhost:8000/api/users/uploadidback/${userData.id}`,
+        `http://localhost:8000/api/users/uploadidback/${Auth.state.userData.id}`,
         idBackData,
         {
           headers: {
@@ -125,7 +126,7 @@ function VerifyAccount({ history }) {
 
     try {
       const res = await axios.post(
-        `http://localhost:8000/api/users/uploadidwithselfie/${userData.id}`,
+        `http://localhost:8000/api/users/uploadidwithselfie/${Auth.state.userData.id}`,
         idWithSelfieData,
         {
           headers: {
@@ -175,7 +176,7 @@ function VerifyAccount({ history }) {
 
     if (check === 0) {
       Axios.post("http://localhost:8000/api/users/verificationRequest", {
-        id: userData.id,
+        id: Auth.state.userData.id,
         idFront: uploadedFileIdFront.filePath,
         idBack: uploadedFileIdBack.filePath,
         idWithSelfie: uploadedFileIdWithSelfie.filePath,
@@ -187,7 +188,7 @@ function VerifyAccount({ history }) {
       });
       console.log();
 
-      history.push("/welcome");
+      history.push("/home");
     } else {
       console.log("incomplete pictures uploaded");
     }
@@ -340,4 +341,4 @@ function VerifyAccount({ history }) {
   );
 }
 
-export default VerifyAccount;
+export default withRouter(VerifyAccount);

@@ -19,15 +19,19 @@ import {
 } from "reactstrap";
 import logo from "./assets/parklogo.png";
 import Axios from "axios";
+import { withRouter } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
+import { AuthContext } from "./GlobalContext/AuthContext";
 
 function Login({ history }) {
   let [userName, setUserName] = useState("");
   let [password, setPassword] = useState("");
   let [error, setError] = useState("");
+  localStorage.clear();
+  let Auth = useContext(AuthContext);
 
-  let { setUserData } = useContext(UserContext);
-
+  // let { setUserData } = useContext(UserContext);
+  console.log("rendered");
   const handleChange = (e) => {
     e.preventDefault();
     if (e.currentTarget.name === "userName") {
@@ -39,31 +43,51 @@ function Login({ history }) {
     setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(userName, password);
-    if (userName === "ADMIN" && password === "ADMIN") {
-      history.push("/admin");
+    let values = {
+      userName,
+      password,
+    };
+    console.log(values);
+    let { success, errorMassage } = await Auth.authenticate(values);
+    console.log(success);
+    // if (succes && userName === "ADMIN" && password === "ADMIN") {
+    //   history.push("/admin");
+    // }
+    if (success) {
+      if (userName === "ADMIN" && password === "ADMIN") {
+        history.push("/admin");
+      } else {
+        history.push("/home");
+      }
     } else {
-      Axios.post("http://localhost:8000/api/users/login", {
-        userName,
-        password,
-      })
-        .then((_res) => {
-          console.log(_res);
-
-          let data = _res.data;
-
-          if (data) {
-            setUserData(data);
-            localStorage.setItem("userData", JSON.stringify(data));
-            history.push("/home");
-          } else {
-            setError("Wrong username or password");
-          }
-        })
-        .catch((error) => console.log(error));
+      setError("Wrong username or password");
     }
+
+    console.log(userName, password);
+    // if (userName === "ADMIN" && password === "ADMIN") {
+    //   history.push("/admin");
+    // } else {
+    //   Axios.post("http://localhost:8000/api/auth/login", {
+    //     userName,
+    //     password,
+    //   })
+    //     .then((_res) => {
+    //       console.log(_res);
+
+    //       let data = _res.data;
+
+    //       if (data) {
+    //         setUserData(data);
+    //         localStorage.setItem("userData", JSON.stringify(data));
+    //         history.push("/home");
+    //       } else {
+    //         setError("Wrong username or password");
+    //       }
+    //     })
+    //     .catch((error) => console.log(error));
+    // }
   };
   return (
     <Container>
@@ -110,9 +134,14 @@ function Login({ history }) {
                   </Form>
                 </div>
                 <div className="col-md-12 registerBtn">
-                  <form onClick={(e) => handleSubmit(e)}>
+                  <form>
                     <div>
-                      <button type="login" class="btnReg font-weight-bold">
+                      {/* The fuck is this shit? */}
+                      <button
+                        onClick={(e) => handleSubmit(e)}
+                        type="login"
+                        class="btnReg font-weight-bold"
+                      >
                         LOGIN
                       </button>
                     </div>
@@ -127,4 +156,4 @@ function Login({ history }) {
   );
 }
 
-export default Login;
+export default withRouter(Login);

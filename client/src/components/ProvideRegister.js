@@ -21,9 +21,10 @@ import {
 } from "reactstrap";
 import { isEmpty } from "validator";
 import Axios from "axios";
+import { withRouter } from "react-router-dom";
 
-function ProvideRegister({ history }) {
-  let userData = JSON.parse(localStorage.getItem("userData"));
+function ProvideRegister({ history, Auth }) {
+  //let Auth.state.userData = JSON.parse(localStorage.getItem("Auth.state.userData"));
   const [parkingPictureFile, setParkingPictureFile] = useState("");
   const [parkingPictureFilename, setParkingPictureFilename] = useState(
     "Choose File"
@@ -76,7 +77,7 @@ function ProvideRegister({ history }) {
     parkingPictureData.append("parkingPictureFile", parkingPictureFile);
     try {
       const res = await Axios.post(
-        `http://localhost:8000/api/providers/uploadParkingPict/${userData.id}`,
+        `http://localhost:8000/api/providers/uploadParkingPict/${Auth.state.userData.id}`,
         parkingPictureData,
         {
           headers: {
@@ -112,9 +113,9 @@ function ProvideRegister({ history }) {
     console.log(check);
     if (check === 0) {
       Axios.post("http://localhost:8000/api/providers/insertprovider", {
-        userId: userData.id,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
+        userId: Auth.state.userData.id,
+        firstName: Auth.state.userData.firstName,
+        lastName: Auth.state.userData.lastName,
         personalAddress,
         parkingLotName,
         parkingLotLocation,
@@ -247,4 +248,4 @@ function ProvideRegister({ history }) {
   );
 }
 
-export default ProvideRegister;
+export default withRouter(ProvideRegister);

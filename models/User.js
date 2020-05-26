@@ -6,60 +6,60 @@ const User = db.define("users", {
     type: Sequelize.INTEGER,
     autoIncrement: true,
     primaryKey: true,
-    allowNull: false
+    allowNull: false,
   },
   firstName: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   lastName: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   contactNumber: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   email: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   userName: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   password: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   profilePicture: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   idFront: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   idBack: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   idWithSelfie: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   userStatus: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   createdAt: {
     type: Sequelize.DATE,
-    allowNull: false
+    allowNull: false,
   },
   updatedAt: {
     type: Sequelize.DATE,
-    allowNull: false
-  }
+    allowNull: false,
+  },
 });
 
 module.exports = User;

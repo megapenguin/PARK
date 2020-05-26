@@ -27,9 +27,10 @@ import logo from "./assets/parklogo.png";
 import Axios from "axios";
 import { ParkingContext } from "../context/ParkingContext";
 import LogoutButton from "./layouts/LogoutButton";
+import { withRouter } from "react-router-dom";
 
-function SearchParkingLots({ history }) {
-  let userData = JSON.parse(localStorage.getItem("userData"));
+function SearchParkingLots({ history, Auth }) {
+  //let Auth.state.userData = JSON.parse(localStorage.getIt//em("Auth.state.userData"));
   let [parkingLotLocation, setParkingLotLocation] = useState("");
 
   let [parkingId, setParkingId] = useState({ id: "", userId: "" });
@@ -78,11 +79,14 @@ function SearchParkingLots({ history }) {
     //
   };
   const goToGarage = (e) => {
-    if (userData.userStatus === "verified") {
+    if (Auth.state.userData.userStatus === "verified") {
       history.push("/view-parking-lot");
     } else {
       setWarning("You are not yet a verified user");
     }
+  };
+  const handleToBack = (e) => {
+    history.push("/home");
   };
 
   return (
@@ -130,42 +134,56 @@ function SearchParkingLots({ history }) {
                         name={info.userid}
                         style={{ fontWeight: "bold" }}
                       >
-                        <ul
-                          className="list-group"
-                          onClick={(e) => viewGarage(info.id, info.userId)}
-                        >
-                          <li
-                            className="list-group-item list-group-item-secondary"
-                            style={{ textAlign: "left" }}
+                        {info.providerStatus !== "unverified" ? (
+                          <ul
+                            className="mb-3 list-group"
+                            onClick={(e) => viewGarage(info.id, info.userId)}
                           >
-                            <img
-                              style={{
-                                textAlign: "left",
-                                fontWeight: "bold",
-                                border: "1px solid #ced4da",
-                                width: "30%",
-                              }}
-                              src={info.parkingLotPicture}
-                            />
-                            <div style={{ textAlign: "right" }}>
-                              <h5>{info.parkingLotName}</h5>
-                              <p>{info.parkingLotLocation}</p>
-                            </div>
-                            {parkingId.id === info.id ? (
-                              <button onClick={goToGarage}>View Garage</button>
-                            ) : (
-                              " "
-                            )}
-                          </li>
-                        </ul>
+                            <li
+                              className="list-group-item list-group-item-secondary"
+                              style={{ textAlign: "left" }}
+                            >
+                              <img
+                                style={{
+                                  textAlign: "left",
+                                  fontWeight: "bold",
+                                  border: "1px solid #ced4da",
+                                  width: "30%",
+                                }}
+                                src={info.parkingLotPicture}
+                              />
+                              <div style={{ textAlign: "right" }}>
+                                <h5>{info.parkingLotName}</h5>
+                                <p>{info.parkingLotLocation}</p>
+                              </div>
+                              {parkingId.id === info.id ? (
+                                <button onClick={goToGarage}>
+                                  View Garage
+                                </button>
+                              ) : (
+                                " "
+                              )}
+                            </li>
+                          </ul>
+                        ) : (
+                          ""
+                        )}
                       </React.Fragment>
                     ))
                   ) : (
-                    <img src={logo} style={{ width: "80%" }} />
+                    <img className="mb-3" src={logo} style={{ width: "80%" }} />
                   )}
                 </div>
                 <div></div>
-                <LogoutButton />
+                <Col>
+                  <Button
+                    className="mt-2"
+                    color="secondary"
+                    onClick={handleToBack}
+                  >
+                    Home
+                  </Button>
+                </Col>
               </div>
             </CardBody>
           </Card>
@@ -175,4 +193,4 @@ function SearchParkingLots({ history }) {
   );
 }
 
-export default SearchParkingLots;
+export default withRouter(SearchParkingLots);

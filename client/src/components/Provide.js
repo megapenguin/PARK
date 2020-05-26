@@ -20,6 +20,7 @@ import {
 } from "reactstrap";
 import logo from "./assets/parklogo.png";
 import { UserContext } from "../context/UserContext";
+import { withRouter } from "react-router-dom";
 
 function Provide({ history }) {
   let providerData = JSON.parse(localStorage.getItem("providerData"));
@@ -82,4 +83,4 @@ function Provide({ history }) {
   );
 }
 
-export default Provide;
+export default withRouter(Provide);

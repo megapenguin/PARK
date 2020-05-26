@@ -6,6 +6,15 @@ const randomString = require("randomstring");
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 
+router.post("/delete", (req, res) => {
+  let { id } = req.body;
+  console.log(id);
+  Provider.destroy({ where: { id } }).then((_res) => {
+    res.json(_res);
+    console.log(res);
+  });
+});
+
 router.get("/getverifiedproviders", (req, res) => {
   const providerStatus = "verified";
   console.log(providerStatus);
@@ -127,6 +136,23 @@ router.post("/userupdateprovider", (req, res) => {
       parkingLotPicture,
     },
     { where: { id } }
+  )
+    .then((_res) => {
+      res.json(_res);
+      console.log(_res);
+    })
+    .catch((error) => console.log(error));
+});
+
+router.post("/reservedslot", (req, res) => {
+  let { id, userId, reservedSlots } = req.body;
+  console.log(req.body);
+
+  Provider.update(
+    {
+      reservedSlots,
+    },
+    { where: { id, userId } }
   )
     .then((_res) => {
       res.json(_res);

@@ -47,7 +47,7 @@ function ViewUnverifiedUsers() {
       })
       .catch((error) => console.log(error));
     console.log("what happend?");
-  }, [refreshTable]);
+  }, [refreshTable, refreshInfo]);
 
   const handleOnSelect = (index) => {
     console.log(index);
@@ -111,6 +111,19 @@ function ViewUnverifiedUsers() {
       .catch((error) => console.log(error));
     console.log("what happend?");
     setRefreshTable(true);
+  };
+
+  const handleToDecline = (e) => {
+    console.log(userId);
+    Axios.post("http://localhost:8000/api/users/delete", {
+      id: userId,
+    }).then((_res) => {
+      console.log(_res);
+      let data = _res.data;
+      console.log("success delete");
+    });
+    setRefreshTable(!refreshTable);
+    setRefreshInfo(false);
   };
 
   return (
@@ -308,10 +321,12 @@ function ViewUnverifiedUsers() {
                   </Col> */}
                 </Row>
               </Form>
-              <Button color="success" onClick={handleToApprove}>
+              <Button color="success" onClick={(e) => handleToApprove(e)}>
                 Approve
               </Button>{" "}
-              <Button color="danger">Decline</Button>{" "}
+              <Button color="danger" onClick={(e) => handleToDecline()}>
+                Decline
+              </Button>{" "}
             </CardBody>
           </Card>
         </Container>

@@ -3,7 +3,13 @@ import React, { useState, useEffect, useContext, Component } from "react";
 import "./App.css";
 import axios from "axios";
 
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  ProtectedRoute,
+  Link,
+} from "react-router-dom";
 import Register from "./components/Register";
 import Welcome from "./components/Welcome";
 import Login from "./components/Login";
@@ -36,6 +42,13 @@ import { ProviderContextProvider } from "./context/ProviderContext";
 import { ParkingContextProvider } from "./context/ParkingContext";
 import { TransactionContextProvider } from "./context/TransactionContext";
 
+import LoginProtectedRoutes from "./components/ProtectedRoutes/LoginProtectedRoutes";
+import AdminProtectedRoutes from "./components/ProtectedRoutes/AdminProtectedRoutes";
+import MainProtectedRoutes from "./components/ProtectedRoutes/MainProtectedRoutes";
+
+//CONTEXT
+import { AuthContext } from "./components/GlobalContext/AuthContext";
+
 function App() {
   let [b, setB] = useState("PARK");
   let [number, setNumber] = useState(0);
@@ -61,6 +74,8 @@ function App() {
       .catch((error) => console.log(error));
   }, []);
 
+  let Auth = useContext(AuthContext);
+  console.log(Auth);
   return (
     <div className="App">
       <React.Fragment>
@@ -68,64 +83,162 @@ function App() {
           <ParkingContextProvider>
             <UserContextProvider>
               <ProviderContextProvider>
-                <Router>
-                  <Switch>
-                    <Route path="/admin" component={Admin} />
-                    <Route path="/view-users" component={ViewUsers} />
-                    <Route path="/view-providers" component={ViewProviders} />
-                    <Route
-                      path="/view-unverified-providers"
-                      component={ViewUnverifiedProviders}
-                    />
-                    <Route path="/sidebar" component={Sidebar} />
-                    <Route
-                      path="/transaction-history"
-                      component={TransactionRecords}
-                    />
-                    <Route
-                      path="/view-unverified-users"
-                      component={ViewUnverifiedUsers}
-                    />
+                {!Auth.state.isLoading && (
+                  <Router>
+                    <Switch>
+                      {console.log("rendered")}
+                      {/* Ano too?? */}
+                      <LoginProtectedRoutes
+                        Auth={Auth}
+                        path="/login"
+                        component={Login}
+                        exact
+                      />
 
-                    <Route path="/register" component={Register} />
-                    <Route path="/welcome" component={Welcome} />
-                    <Route path="/login" component={Login} />
-                    <Route path="/home" component={Search} />
-                    <Route path="/provide" component={Provide} />
-                    <Route path="/verify-profile" component={VerifyAccount} />
-                    <Route
-                      path="/parking-lot-registration"
-                      component={ProvideRegister}
-                    />
-                    <Route
-                      path="/my-parking-space"
-                      component={MyParkingSpace}
-                    />
-                    <Route
-                      path="/my-parking-space-update"
-                      component={MyParkingGarageUpdate}
-                    />
+                      {/* <Route path="/login" component={Login} /> */}
 
-                    <Route path="/my-parking-lots" component={MyParkingLots} />
-                    <Route
-                      path="/search-parking-lot"
-                      component={SearchParkingLots}
-                    />
-                    <Route path="/edit-profile" component={Profile} />
-                    <Route path="/profile" component={MainProfile} />
-                    <Route
-                      path="/profile-settings"
-                      component={ProfileSettings}
-                    />
-                    <Route path="/parking-request" component={SendRequest} />
-                    <Route path="/view-parking-lot" component={ViewGarage} />
-                    <Route
-                      path="/transaction-records"
-                      component={TransactionHistory}
-                    />
-                    <Route component={() => <h1>URL NOT FOUND</h1>} />
-                  </Switch>
-                </Router>
+                      <MainProtectedRoutes
+                        Auth={Auth}
+                        path="/admin"
+                        component={Admin}
+                        exact
+                      />
+                      {/* <Route path="/admin" component={Admin} /> */}
+                      <MainProtectedRoutes
+                        Auth={Auth}
+                        path="/view-users"
+                        component={ViewUsers}
+                        exact
+                      />
+                      <MainProtectedRoutes
+                        Auth={Auth}
+                        path="/view-providers"
+                        component={ViewProviders}
+                        exact
+                      />
+                      <MainProtectedRoutes
+                        Auth={Auth}
+                        path="/view-unverified-providers"
+                        component={ViewUnverifiedProviders}
+                        exact
+                      />
+                      {/* <MainProtectedRoutes Auth={Auth} path="/sidebar" component={Sidebar} /> */}
+                      <MainProtectedRoutes
+                        Auth={Auth}
+                        path="/transaction-history"
+                        component={TransactionRecords}
+                        exact
+                      />
+                      <MainProtectedRoutes
+                        Auth={Auth}
+                        path="/view-unverified-users"
+                        component={ViewUnverifiedUsers}
+                        exact
+                      />
+
+                      <LoginProtectedRoutes
+                        Auth={Auth}
+                        path="/register"
+                        component={Register}
+                        exact
+                      />
+                      <LoginProtectedRoutes
+                        Auth={Auth}
+                        path="/welcome"
+                        component={Welcome}
+                        exact
+                      />
+
+                      {/* <Route path="/home" component={Search} /> */}
+                      <AdminProtectedRoutes
+                        Auth={Auth}
+                        path="/home"
+                        component={Search}
+                        exact
+                      />
+                      <AdminProtectedRoutes
+                        Auth={Auth}
+                        path="/provide"
+                        component={Provide}
+                        exact
+                      />
+                      <AdminProtectedRoutes
+                        Auth={Auth}
+                        path="/verify-profile"
+                        component={VerifyAccount}
+                        exact
+                      />
+                      <AdminProtectedRoutes
+                        Auth={Auth}
+                        path="/parking-lot-registration"
+                        component={ProvideRegister}
+                        exact
+                      />
+                      <AdminProtectedRoutes
+                        Auth={Auth}
+                        path="/my-parking-space"
+                        component={MyParkingSpace}
+                        exact
+                      />
+                      <AdminProtectedRoutes
+                        Auth={Auth}
+                        path="/my-parking-space-update"
+                        component={MyParkingGarageUpdate}
+                        exact
+                      />
+
+                      <AdminProtectedRoutes
+                        Auth={Auth}
+                        path="/my-parking-lots"
+                        component={MyParkingLots}
+                        exact
+                      />
+                      <AdminProtectedRoutes
+                        Auth={Auth}
+                        path="/search-parking-lot"
+                        component={SearchParkingLots}
+                        exact
+                      />
+                      <AdminProtectedRoutes
+                        Auth={Auth}
+                        path="/edit-profile"
+                        component={Profile}
+                        exact
+                      />
+                      <AdminProtectedRoutes
+                        Auth={Auth}
+                        path="/profile"
+                        component={MainProfile}
+                        exact
+                      />
+                      <AdminProtectedRoutes
+                        Auth={Auth}
+                        path="/profile-settings"
+                        component={ProfileSettings}
+                        exact
+                      />
+                      <AdminProtectedRoutes
+                        Auth={Auth}
+                        path="/parking-request"
+                        component={SendRequest}
+                        exact
+                      />
+                      <AdminProtectedRoutes
+                        Auth={Auth}
+                        path="/view-parking-lot"
+                        component={ViewGarage}
+                        exact
+                      />
+                      <AdminProtectedRoutes
+                        Auth={Auth}
+                        path="/transaction-records"
+                        component={TransactionHistory}
+                        exact
+                      />
+                      <Route component={() => <h1>URL NOT FOUND</h1>} />
+                    </Switch>
+                  </Router>
+                )}
               </ProviderContextProvider>
             </UserContextProvider>
           </ParkingContextProvider>

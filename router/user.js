@@ -5,6 +5,9 @@ const fileUpload = require("express-fileupload");
 const randomString = require("randomstring");
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+const someOtherPlaintextPassword = "not_bacon";
 
 router.get("/", (req, res) => {
   User.findAll()
@@ -17,10 +20,54 @@ router.get("/", (req, res) => {
 });
 
 router.post("/delete", (req, res) => {
-  let id = req.body;
+  let { id } = req.body;
+  console.log(id);
   User.destroy({ where: { id } }).then((_res) => {
     res.json(_res);
     console.log(res);
+  });
+});
+
+router.post("/register", (req, res) => {
+  let { id } = req.query;
+  let {
+    firstName,
+    lastName,
+    contactNumber,
+    email,
+    userName,
+    password,
+    profilePicture,
+    idFront,
+    idBack,
+    idWithSelfie,
+    userStatus,
+  } = req.body;
+
+  bcrypt.genSalt(10, function (err, salt) {
+    bcrypt.hash(password, salt, function (err, hash) {
+      // Store hash in your password DB.
+      if (err) return res.sendStatus(500);
+
+      User.create({
+        firstName,
+        lastName,
+        contactNumber,
+        email,
+        userName,
+        password: hash,
+        profilePicture,
+        idFront,
+        idBack,
+        idWithSelfie,
+        userStatus,
+      })
+        .then((_res) => {
+          res.json(_res);
+          console.log(_res);
+        })
+        .catch((error) => console.log(error));
+    });
   });
 });
 

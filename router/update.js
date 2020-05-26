@@ -15,7 +15,7 @@ router.post("/insert", (req, res) => {
 
   //User.update({ where: { id } });
 
-  let { userId, firstName, lastName, contactNumber, email } = req.body;
+  let { userId, firstName, lastName, contactNumber, email, status } = req.body;
 
   Update.create({
     userId,
@@ -23,6 +23,7 @@ router.post("/insert", (req, res) => {
     lastName,
     contactNumber,
     email,
+    status,
   })
     .then((_res) => {
       res.json(_res);
@@ -55,6 +56,7 @@ router.post("/find", (req, res) => {
           lastName,
           contactNumber,
           email,
+          status,
         } = _res.dataValues;
         res.json({
           id,
@@ -63,6 +65,7 @@ router.post("/find", (req, res) => {
           lastName,
           contactNumber,
           email,
+          status,
         });
       } else {
         res.json(_res);
@@ -74,16 +77,33 @@ router.post("/find", (req, res) => {
 });
 
 router.post("/updateusers", (req, res) => {
-  let { userId, firstName, lastName, contactNumber, email } = req.body;
+  let { userId, firstName, lastName, contactNumber, email, status } = req.body;
   console.log(req.body);
 
   Update.update(
-    { firstName, lastName, contactNumber, email },
+    { firstName, lastName, contactNumber, email, status },
     { where: { userId } }
   )
     .then((_res) => {
       res.json(_res);
       console.log(_res);
+    })
+    .catch((error) => console.log(error));
+});
+
+router.get("/getupdaterequests", (req, res) => {
+  const status = "Yes";
+  console.log(status);
+  Update.findAll({
+    where: {
+      status: {
+        [Op.like]: status,
+      },
+    },
+  })
+    .then((_res) => {
+      res.json(_res);
+      console.log(res);
     })
     .catch((error) => console.log(error));
 });

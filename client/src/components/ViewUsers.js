@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import noimageicon from "./assets/noimageicon.jpg";
 import Sidebar from "./layouts/Sidebar";
+import UpdateRequest from "./layouts/UpdateRequest";
 import parklogo from "./assets/parklogo.png";
 import {
   Table,
@@ -21,6 +22,9 @@ import Axios from "axios";
 
 function ViewUsers() {
   let [searchResult, setSearchResult] = useState([]);
+  let [requestResult, setRequestResult] = useState([]);
+  let [requestInfo, setRequestInfo] = useState([]);
+
   let [idFront, setIdFront] = useState("");
   let [idBack, setIdBack] = useState("");
   let [idWithSelfie, setIdWithSelfie] = useState("");
@@ -34,6 +38,8 @@ function ViewUsers() {
   let [searchUser, setSearchUser] = useState("");
   let [refreshInfo, setRefreshInfo] = useState(false);
   let [refreshTable, setRefreshTable] = useState(0);
+  let [viewId, setViewId] = useState("");
+  let [ref, setRef] = useState(false);
 
   useEffect(() => {
     Axios.get("http://localhost:8000/api/users/getverifiedusers")
@@ -48,6 +54,19 @@ function ViewUsers() {
     console.log("what happend?");
     console.log("refreshTable");
   }, [refreshTable]);
+
+  useEffect(() => {
+    Axios.get("http://localhost:8000/api/updates/getupdaterequests")
+      .then((_res) => {
+        console.log(_res);
+        let data = _res.data;
+        requestResult = data;
+        setRequestResult(requestResult);
+        console.log(searchResult);
+      })
+      .catch((error) => console.log(error));
+    console.log(requestResult);
+  }, [ref]);
 
   const enterSearch = (e) => {
     e.preventDefault();
@@ -156,6 +175,37 @@ function ViewUsers() {
     }
   };
 
+  const viewRequest = (id, userId) => {
+    setViewId(id);
+    setRef(!ref);
+    Axios.post("http://localhost:8000/api/updates/find", {
+      userId: userId,
+    })
+      .then((_res) => {
+        console.log(_res);
+
+        let data = _res.data;
+
+        requestInfo = data;
+        setRequestInfo(requestInfo);
+        console.log(requestInfo);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const handleToDelete = (e) => {
+    console.log(userId);
+    Axios.post("http://localhost:8000/api/users/delete", {
+      id: userId,
+    }).then((_res) => {
+      console.log(_res);
+      let data = _res.data;
+      console.log("success delete");
+    });
+    setRefreshTable(!refreshTable);
+    setRefreshInfo(false);
+  };
+
   return (
     <React.Fragment>
       <Container>
@@ -197,7 +247,7 @@ function ViewUsers() {
                         borderBottomRightRadius: 50,
                         borderTopRightRadius: 50,
                       }}
-                      onClick={handleOnSearch}
+                      onClick={(e) => handleOnSearch(e)}
                     >
                       Search
                     </Button>
@@ -210,7 +260,7 @@ function ViewUsers() {
                   <thead>
                     <tr>
                       <th>ID</th>
-                      <th>First Name</th>
+                      <th>First </th>
                       <th>Last Name</th>
                     </tr>
                   </thead>
@@ -232,7 +282,7 @@ function ViewUsers() {
             </Container>
           </Col>
           <Col>
-            <Container className="mt-3">
+            <Container className="mt-5 mr-5">
               <h2>ID Pictures</h2>
               <Card style={{ fontWeight: "bold", border: "hidden" }}>
                 <CardTitle>
@@ -271,101 +321,162 @@ function ViewUsers() {
           </Col>
         </Row>
       </Container>
-      <Row>
-        <Container>
-          <h2 className="mt-2">User Information</h2>
-          <Card style={{ border: "hidden" }}>
-            <CardTitle className="mt-2">
-              <img
-                id="profilepicture"
-                src={refreshInfo === true ? profilePicture : noimageicon}
-                style={{
-                  height: 150,
-                  width: 150,
-                  border: "1px solid black",
-                }}
-              ></img>{" "}
-            </CardTitle>
+      <Container className="mt-5 mr-5">
+        <Row>
+          <Col>
+            <Container>
+              <Row>
+                <Col>
+                  <h2>Update Request</h2>
+                </Col>
+              </Row>
 
-            <CardBody>
-              <Form>
-                <Row form>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label style={{ fontWeight: "bold" }}>
-                        <h5>
-                          Use ID:{refreshInfo === true ? userId : "User ID"}
-                        </h5>
-                      </Label>
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label style={{ fontWeight: "bold" }}>
-                        <h5>
-                          Username:
-                          {refreshInfo === true ? userName : "Username"}
-                        </h5>
-                      </Label>
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label for="firstname">Firstname</Label>
-                      <Input
-                        type="text"
-                        name="firstname"
-                        id="firstname"
-                        onChange={handleOnChange}
-                        style={{ textAlign: "center", borderRadius: 10 }}
-                        value={refreshInfo === true ? firstName : "Firstname"}
-                      ></Input>
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label for="lastname">Lastname</Label>
-                      <Input
-                        type="text"
-                        name="lastname"
-                        id="lastname"
-                        onChange={handleOnChange}
-                        style={{ textAlign: "center", borderRadius: 10 }}
-                        value={refreshInfo === true ? lastName : "Lastname"}
-                      />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label for="contactnumber">Contact Number</Label>
-                      <Input
-                        type="text"
-                        name="contactnumber"
-                        id="contactnumber"
-                        onChange={handleOnChange}
-                        style={{ textAlign: "center", borderRadius: 10 }}
-                        value={
-                          refreshInfo === true
-                            ? contactNumber
-                            : "Contact Number"
-                        }
-                      />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label for="emailaddress">Email Address</Label>
-                      <Input
-                        type="text"
-                        name="emailaddress"
-                        id="emailaddress"
-                        onChange={handleOnChange}
-                        style={{ textAlign: "center", borderRadius: 10 }}
-                        value={refreshInfo === true ? email : "Email Address"}
-                      />
-                    </FormGroup>
-                  </Col>
-                  {/* <Col>
+              <Card style={{ height: 400, border: "hidden " }}>
+                <Table
+                  className="mt-3"
+                  style={{ textAlign: "center", border: "hidden" }}
+                >
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>View</th>
+                    </tr>
+                  </thead>
+                </Table>
+                <Table hover responsive>
+                  <tbody>
+                    {requestResult.length !== 0
+                      ? requestResult.map((info, index) => (
+                          <tr
+                            id={index}
+                            onClick={(e) => viewRequest(info.id, info.userId)}
+                          >
+                            <th scope="row">{info.userId}</th>
+                            <td>
+                              {info.firstName} {info.lastName}
+                            </td>
+                            <td>
+                              {" "}
+                              {viewId === info.id ? (
+                                <UpdateRequest
+                                  buttonLabel={"Details"}
+                                  requestInfo={requestInfo}
+                                  value={ref}
+                                  clickValue={setRef}
+                                  description={"view"}
+                                />
+                              ) : (
+                                " "
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      : ""}
+                  </tbody>
+                </Table>
+              </Card>
+            </Container>
+          </Col>
+          <Col>
+            <Container className="mr-5">
+              <h2>User Information</h2>
+              <Card style={{ border: "hidden" }}>
+                <CardTitle className="mt-2">
+                  <img
+                    id="profilepicture"
+                    src={refreshInfo === true ? profilePicture : noimageicon}
+                    style={{
+                      height: 150,
+                      width: 150,
+                      border: "1px solid black",
+                    }}
+                  ></img>{" "}
+                </CardTitle>
+
+                <CardBody>
+                  <Form>
+                    <Row form>
+                      <Col md={6}>
+                        <FormGroup>
+                          <Label style={{ fontWeight: "bold" }}>
+                            <h5>
+                              Use ID:{refreshInfo === true ? userId : "User ID"}
+                            </h5>
+                          </Label>
+                        </FormGroup>
+                      </Col>
+                      <Col md={6}>
+                        <FormGroup>
+                          <Label style={{ fontWeight: "bold" }}>
+                            <h5>
+                              Username:
+                              {refreshInfo === true ? userName : "Username"}
+                            </h5>
+                          </Label>
+                        </FormGroup>
+                      </Col>
+                      <Col md={6}>
+                        <FormGroup>
+                          <Label for="firstname">Firstname</Label>
+                          <Input
+                            type="text"
+                            name="firstname"
+                            id="firstname"
+                            onChange={(e) => handleOnChange(e)}
+                            style={{ textAlign: "center", borderRadius: 10 }}
+                            value={
+                              refreshInfo === true ? firstName : "Firstname"
+                            }
+                          ></Input>
+                        </FormGroup>
+                      </Col>
+                      <Col md={6}>
+                        <FormGroup>
+                          <Label for="lastname">Lastname</Label>
+                          <Input
+                            type="text"
+                            name="lastname"
+                            id="lastname"
+                            onChange={(e) => handleOnChange(e)}
+                            style={{ textAlign: "center", borderRadius: 10 }}
+                            value={refreshInfo === true ? lastName : "Lastname"}
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col md={6}>
+                        <FormGroup>
+                          <Label for="contactnumber">Contact Number</Label>
+                          <Input
+                            type="text"
+                            name="contactnumber"
+                            id="contactnumber"
+                            onChange={(e) => handleOnChange(e)}
+                            style={{ textAlign: "center", borderRadius: 10 }}
+                            value={
+                              refreshInfo === true
+                                ? contactNumber
+                                : "Contact Number"
+                            }
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col md={6}>
+                        <FormGroup>
+                          <Label for="emailaddress">Email Address</Label>
+                          <Input
+                            type="text"
+                            name="emailaddress"
+                            id="emailaddress"
+                            onChange={(e) => handleOnChange(e)}
+                            style={{ textAlign: "center", borderRadius: 10 }}
+                            value={
+                              refreshInfo === true ? email : "Email Address"
+                            }
+                          />
+                        </FormGroup>
+                      </Col>
+                      {/* <Col>
                     <FormGroup>
                       <Label for="address">Personal Address</Label>
                       <Input
@@ -377,16 +488,20 @@ function ViewUsers() {
                       />
                     </FormGroup>
                   </Col> */}
-                </Row>
-              </Form>
-              <Button color="success" onClick={handleToUpdate}>
-                Update {<Input type="reset" defaultValue="Reset" hidden />}
-              </Button>{" "}
-              <Button color="danger">Delete</Button>{" "}
-            </CardBody>
-          </Card>
-        </Container>
-      </Row>
+                    </Row>
+                  </Form>
+                  <Button color="success" onClick={(e) => handleToUpdate(e)}>
+                    Update {<Input type="reset" defaultValue="Reset" hidden />}
+                  </Button>{" "}
+                  <Button color="danger" onClick={(e) => handleToDelete(e)}>
+                    Delete
+                  </Button>{" "}
+                </CardBody>
+              </Card>
+            </Container>
+          </Col>
+        </Row>
+      </Container>
     </React.Fragment>
   );
 }

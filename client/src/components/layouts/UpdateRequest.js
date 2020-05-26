@@ -29,20 +29,7 @@ const UpdateRequest = (props) => {
   let [lastName, setLastname] = useState(result.lastName);
   let [contactNumber, setContactNumber] = useState(result.contactNumber);
   let [email, setEmail] = useState(result.email);
-
-  useEffect(() => {
-    Axios.post("http://localhost:8000/api/updates/insert", {
-      userId: result.id,
-      firstName: result.firstName,
-      lastName: result.lastName,
-      contactNumber: result.contactNumber,
-      email: result.email,
-    }).then((_res) => {
-      console.log(_res.data);
-      let data = _res.data;
-      console.log("Success");
-    });
-  }, []);
+  let [status, setStatus] = useState("Yes");
 
   const handleOnChange = (e) => {
     e.preventDefault();
@@ -63,6 +50,9 @@ const UpdateRequest = (props) => {
   };
 
   const toggle = () => {
+    if (description == "view") {
+      setStatus("No");
+    }
     setResult(requestInfo);
     setModal(!modal);
     clickValue(!value);
@@ -82,30 +72,41 @@ const UpdateRequest = (props) => {
     //   setEmail(result.email);
     // }
 
-    Axios.post("http://localhost:8000/api/updates/updateuser", {
+    Axios.post("http://localhost:8000/api/updates/updateusers", {
       userId: result.id,
       firstName: firstName,
       lastName: lastName,
       contactNumber: contactNumber,
       email: email,
+      status: status,
     }).then((_res) => {
       console.log(_res.data);
       let data = _res.data;
-      console.log("Success update from modal");
+      console.log("No");
+    });
+    clickValue(!value);
+    setModal(!modal);
+  };
+  const handleToUpdate = (e) => {
+    Axios.post("http://localhost:8000/api/updates/updateusers", {
+      userId: result.userId,
+      firstName: firstName,
+      lastName: lastName,
+      contactNumber: contactNumber,
+      email: email,
+      status: status,
+    }).then((_res) => {
+      console.log(_res.data);
+      let data = _res.data;
+      console.log("Yes");
     });
     clickValue(!value);
     setModal(!modal);
   };
 
   const handleToClose = (e) => {
-    Axios.post("http://localhost:8000/api/updates/delete", {
-      userId: result.id,
-    }).then((_res) => {
-      console.log(_res.data);
-      let data = _res.data;
-      console.log("Success update from modal");
-    });
-    console.log(result);
+    clickValue(!value);
+    setModal(!modal);
   };
 
   return (
@@ -188,8 +189,11 @@ const UpdateRequest = (props) => {
         </ModalBody>
         {description === "view" ? (
           <ModalFooter>
-            <Button color="primary" onClick={toggle}>
+            <Button color="primary" onClick={handleToUpdate}>
               Done
+            </Button>
+            <Button color="danger" onClick={handleToClose}>
+              Cancel
             </Button>
           </ModalFooter>
         ) : (

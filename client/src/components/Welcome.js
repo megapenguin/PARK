@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useContext } from "react";
 import "./styles.css";
 import {
   Card,
@@ -10,19 +10,25 @@ import {
   Button,
   Container,
   Row,
-  Col
+  Col,
 } from "reactstrap";
 import logo from "./assets/parklogo.png";
 import { withRouter } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
+import { AuthContext } from "./GlobalContext/AuthContext";
 
 function Welcome({ history }) {
   localStorage.clear();
-  const handleNavigateToLogin = e => {
+  let Auth = useContext(AuthContext);
+
+  useEffect(() => {
+    localStorage.clear();
+  }, []);
+  const handleNavigateToLogin = (e) => {
     e.preventDefault();
     history.push("/login");
   };
-  const handleToNavigateRegister = e => {
+  const handleToNavigateRegister = (e) => {
     e.preventDefault();
     history.push("/register");
   };
@@ -46,7 +52,7 @@ function Welcome({ history }) {
                         type="login"
                         class="btnLogin font-weight-bold"
                         style={{ borderRadius: 50 }}
-                        onClick={e => handleNavigateToLogin(e)}
+                        onClick={(e) => handleNavigateToLogin(e)}
                       >
                         LOGIN
                       </button>
@@ -59,7 +65,7 @@ function Welcome({ history }) {
                       <button
                         type="login"
                         class="btnReg font-weight-bold"
-                        onClick={e => handleToNavigateRegister(e)}
+                        onClick={(e) => handleToNavigateRegister(e)}
                       >
                         REGISTER
                       </button>

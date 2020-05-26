@@ -20,15 +20,16 @@ import {
 } from "reactstrap";
 import logo from "./assets/parklogo.png";
 import Axios from "axios";
+import { withRouter } from "react-router-dom";
 
-function ProvideParkingSpace({ history }) {
+function ProvideParkingSpace({ history, Auth }) {
   let providerData = JSON.parse(localStorage.getItem("providerData"));
-  let userData = JSON.parse(localStorage.getItem("userData"));
+  //let Auth.state.userData = JSON.parse(localStorage.getItem("Auth.state.userData"));
   let parkingData = JSON.parse(localStorage.getItem("parkingData"));
   let [providerInfo, setProviderInfo] = useState([]);
 
   console.log("what?");
-  console.log(userData);
+  console.log(Auth.state.userData);
 
   const handleToProfile = (e) => {
     e.preventDefault();
@@ -43,8 +44,8 @@ function ProvideParkingSpace({ history }) {
   useEffect(() => {
     Axios.post("http://localhost:8000/api/providers/providerparkinglot", {
       id: parkingData.id,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
+      firstName: Auth.state.userData.firstName,
+      lastName: Auth.state.userData.lastName,
     }).then((_res) => {
       console.log(_res);
       let data = _res.data;
@@ -146,4 +147,4 @@ function ProvideParkingSpace({ history }) {
   );
 }
 
-export default ProvideParkingSpace;
+export default withRouter(ProvideParkingSpace);

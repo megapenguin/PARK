@@ -21,8 +21,9 @@ import {
 } from "reactstrap";
 import { UserContext } from "../context/UserContext";
 import Axios from "axios";
+import { withRouter } from "react-router-dom";
 
-function Profile({ history }) {
+function Profile({ history, Auth }) {
   const [file, setFile] = useState("");
   const [filename, setFilename] = useState("Choose File");
   const [uploadedFile, setUploadedFile] = useState("");
@@ -30,16 +31,31 @@ function Profile({ history }) {
   let [currentInfo, setCurrentInfo] = useState([]);
   let [accName, setAccname] = useState("");
   let [accId, setAccId] = useState("");
+  let [currentUser, setCurrentUser] = useState([]);
 
-  let userData = JSON.parse(localStorage.getItem("userData"));
+  //let Auth.state.userData = JSON.parse(localStorage.getItem("Auth.state.userData"));
   let { setUserData } = useContext(UserContext);
 
   // console.log(uploadedFile, filename);
-  // console.log(userData);
+  // console.log(Auth.state.userData);
   useEffect(() => {
-    setCurrentInfo(userData);
-    setAccId(userData.id);
-    setAccname(userData.userName);
+    setCurrentInfo(Auth.state.userData);
+    setAccId(Auth.state.userData.id);
+    setAccname(Auth.state.userData.userName);
+  }, []);
+
+  useEffect(() => {
+    Axios.post("http://localhost:8000/api/users/search", {
+      id: Auth.state.userData.id,
+      userName: Auth.state.userData.userName,
+    }).then((_res) => {
+      console.log(_res);
+      let data = _res.data;
+      currentUser = data;
+      setCurrentUser(currentUser);
+      console.log(currentUser);
+      console.log("currentUser");
+    });
   }, []);
 
   const onChange = (e) => {
@@ -96,22 +112,22 @@ function Profile({ history }) {
         console.log(data);
       });
       console.log(uploadedFile.filePath);
-      history.push("/welcome");
+      history.push("/home");
     } else {
       console.log("no pictures uploaded");
     }
   };
 
   const handleToBack = (e) => {
-    Axios.post("http://localhost:8000/api/users/search", {
-      userName: accName,
-      id: accId,
-    }).then((_res) => {
-      console.log(_res);
-      let data = _res.data;
-      localStorage.clear();
-      localStorage.setItem("userData", JSON.stringify(data));
-    });
+    // Axios.post("http://localhost:8000/api/users/search", {
+    //   userName: accName,
+    //   id: accId,
+    // }).then((_res) => {
+    //   console.log(_res);
+    //   let data = _res.data;
+    //   localStorage.clear();
+    //   localStorage.setItem("Auth.state.userData", JSON.stringify(data));
+    // });
     history.push("/profile");
   };
 
@@ -193,4 +209,4 @@ function Profile({ history }) {
   );
 }
 
-export default Profile;
+export default withRouter(Profile);

@@ -5,9 +5,9 @@ import { Link } from "react-router-dom";
 function LogoutButton() {
   return (
     <Container>
-      <Link to="/welcome">
+      <Link to="/home">
         {" "}
-        <Button color="danger">Log Out</Button>
+        <Button color="primary">Home</Button>
       </Link>
     </Container>
   );

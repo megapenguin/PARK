@@ -20,16 +20,32 @@ import {
 } from "reactstrap";
 import logo from "./assets/parklogo.png";
 import Axios from "axios";
+import { withRouter } from "react-router-dom";
 
-function TransactionHistory({ history }) {
-  let userData = JSON.parse(localStorage.getItem("userData"));
+function TransactionHistory({ history, Auth }) {
+  //let Auth.state.userData = JSON.parse(localStorage.getItem("Auth.state.userData"));
   let [transactionData, setTransactionData] = useState([]);
+  let [currentUser, setCurrentUser] = useState([]);
 
-  let currentProfile = userData.profilePicture;
+  useEffect(() => {
+    Axios.post("http://localhost:8000/api/users/search", {
+      id: Auth.state.userData.id,
+      userName: Auth.state.userData.userName,
+    }).then((_res) => {
+      console.log(_res);
+      let data = _res.data;
+      currentUser = data;
+      setCurrentUser(currentUser);
+      console.log(currentUser);
+      console.log("currentUser");
+    });
+  }, []);
+
+  let currentProfile = currentUser.profilePicture;
 
   useEffect(() => {
     Axios.post(
-      `http://localhost:8000/api/transactions/searchtransactions/${userData.id}`,
+      `http://localhost:8000/api/transactions/searchtransactions/${Auth.state.userData.id}`,
       {}
     ).then((_res) => {
       console.log(_res);
@@ -44,9 +60,9 @@ function TransactionHistory({ history }) {
     console.log(transactionData);
   }, []);
 
-  const handleToHome = (e) => {
+  const back = (e) => {
     e.preventDefault();
-    history.push("/home");
+    history.push("/profile");
   };
   return (
     <Container>
@@ -65,7 +81,8 @@ function TransactionHistory({ history }) {
                     <FormGroup>
                       <div className="text-center">
                         <h1 style={{ fontWeight: "bold" }}>
-                          {userData.firstName} {userData.lastName}
+                          {Auth.state.userData.firstName}{" "}
+                          {Auth.state.userData.lastName}
                         </h1>
                         <CardSubtitle>
                           <img
@@ -103,9 +120,9 @@ function TransactionHistory({ history }) {
                       <Button
                         className="mt-3"
                         color="secondary"
-                        onClick={handleToHome}
+                        onClick={(e) => back(e)}
                       >
-                        Home
+                        Back
                       </Button>
                     </FormGroup>
                   </Form>
@@ -119,4 +136,4 @@ function TransactionHistory({ history }) {
   );
 }
 
-export default TransactionHistory;
+export default withRouter(TransactionHistory);

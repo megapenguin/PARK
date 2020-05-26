@@ -14,6 +14,7 @@ import {
   Row,
   Col,
   Form,
+  NavLink,
   FormGroup,
   Input,
   Label,
@@ -22,16 +23,22 @@ import logo from "./assets/parklogo.png";
 import Axios from "axios";
 import { ProviderContext } from "../context/ProviderContext";
 import LogoutButton from "./layouts/LogoutButton";
+import { withRouter, Link } from "react-router-dom";
 
-function Search({ history }) {
+//hindi na props kasi naka destrcuture na yan
+//para di na mag props.Auth
+function Search({ history, Auth }) {
   let { setProviderData } = useContext(ProviderContext);
-  let userData = JSON.parse(localStorage.getItem("userData"));
+  //let Auth = JSON.parse(localStorage.ge"));
+  // Wala na laman ang userDat mo kasi di ka na nag sasave ng userdata sa local storage
+
+  let [status, setStatus] = useState("No");
 
   useEffect(() => {
     Axios.post("http://localhost:8000/api/providers/searchprovider", {
-      userId: userData.id,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
+      userId: Auth.state.userData.id,
+      firstName: Auth.state.userData.firstName,
+      lastName: Auth.state.userData.lastName,
     })
       .then((_res) => {
         console.log(_res);
@@ -51,11 +58,44 @@ function Search({ history }) {
       .catch((error) => console.log(error));
   }, []);
 
+  useEffect(() => {
+    Axios.post("http://localhost:8000/api/updates/find", {
+      userId: Auth.state.userData.id,
+    })
+      .then((_res) => {
+        console.log(_res);
+
+        let data = _res.data;
+        console.log(data);
+        if (data) {
+          console.log("succes");
+        } else {
+          console.log("create update");
+          Axios.post("http://localhost:8000/api/updates/insert", {
+            userId: Auth.state.userData.id,
+            firstName: Auth.state.userData.firstName,
+            lastName: Auth.state.userData.lastName,
+            contactNumber: Auth.state.userData.contactNumber,
+            email: Auth.state.userData.email,
+            status: status,
+          }).then((_res) => {
+            console.log(_res);
+          });
+        }
+      })
+      .catch((error) => console.log(error));
+  }, []);
+
   console.log("done");
   const handleToSearch = (e) => {
     e.preventDefault();
 
     history.push("/search-parking-lot");
+  };
+
+  const logOut = (e) => {
+    localStorage.clear();
+    history.push("/welcome");
   };
 
   const handleToProvide = (e) => {
@@ -109,7 +149,17 @@ function Search({ history }) {
                       </h4>
                     </div>
                   </form>
-                  <LogoutButton />
+                  <div>
+                    <Row>
+                      <Col>
+                        <NavLink href="/welcome">
+                          <Button onClick={(e) => logOut(e)} color="danger">
+                            Log Out
+                          </Button>
+                        </NavLink>
+                      </Col>
+                    </Row>
+                  </div>
                 </div>
               </div>
             </CardBody>
@@ -120,4 +170,4 @@ function Search({ history }) {
   );
 }
 
-export default Search;
+export default withRouter(Search);

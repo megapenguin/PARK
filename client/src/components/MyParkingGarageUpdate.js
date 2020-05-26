@@ -21,10 +21,11 @@ import {
 import logo from "./assets/parklogo.png";
 import Axios from "axios";
 import { isEmpty } from "validator";
+import { withRouter } from "react-router-dom";
 
-function MyParkingGarageUpdate({ history }) {
+function MyParkingGarageUpdate({ history, Auth }) {
   let providerData = JSON.parse(localStorage.getItem("providerData"));
-  let userData = JSON.parse(localStorage.getItem("userData"));
+  //let Auth.state.userData = JSON.parse(localStorage.getItem("Auth.state.userData"));
   let parkingData = JSON.parse(localStorage.getItem("parkingData"));
   let [providerInfo, setProviderInfo] = useState([]);
   const [parkingPictureFile, setParkingPictureFile] = useState("");
@@ -42,8 +43,8 @@ function MyParkingGarageUpdate({ history }) {
   useEffect(() => {
     Axios.post("http://localhost:8000/api/providers/providerparkinglot", {
       id: parkingData.id,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
+      firstName: Auth.state.userData.firstName,
+      lastName: Auth.state.userData.lastName,
     }).then((_res) => {
       console.log(_res);
       let data = _res.data;
@@ -58,8 +59,10 @@ function MyParkingGarageUpdate({ history }) {
   }, []);
 
   let garagePicture = providerInfo.parkingLotPicture;
-  let [parkingLotName, setParkingLotName] = useState("");
-  let [mobileNumber, setMobileNumber] = useState("");
+  let [parkingLotName, setParkingLotName] = useState(
+    providerInfo.parkingLotName
+  );
+  let [mobileNumber, setMobileNumber] = useState(providerInfo.mobileNumber);
 
   const onChange = (e) => {
     setParkingPictureFile(e.target.files[0]);
@@ -72,7 +75,7 @@ function MyParkingGarageUpdate({ history }) {
     parkingPictureData.append("parkingPictureFile", parkingPictureFile);
     try {
       const res = await Axios.post(
-        `http://localhost:8000/api/providers/uploadParkingPict/${userData.id}`,
+        `http://localhost:8000/api/providers/uploadParkingPict/${Auth.state.userData.id}`,
         parkingPictureData,
         {
           headers: {
@@ -110,30 +113,26 @@ function MyParkingGarageUpdate({ history }) {
   const onUpdate = (e) => {
     e.preventDefault();
     let check = 0;
-    if (!parkingLotName) {
-      check++;
-    }
-    if (!mobileNumber) {
-      check++;
-    }
-    if (!uploadedFileParkingPicture) {
-      check++;
-    }
-    console.log(check);
-    if (check === 0) {
-      Axios.post("http://localhost:8000/api/providers/userupdateprovider", {
-        id: providerInfo.id,
-        parkingLotName,
-        mobileNumber,
-        parkingLotPicture: uploadedFileParkingPicture.filePath,
-      }).then((_res) => {
-        console.log(_res);
-      });
-      history.push("/home");
-    } else {
-      e.preventDefault();
-      console.log("error");
-    }
+    // if (!parkingLotName) {
+    //   check++;
+    // }
+    // if (!mobileNumber) {
+    //   check++;
+    // }
+    // if (!uploadedFileParkingPicture) {
+    //   check++;
+    // }
+    // console.log(check);
+    // if (check === 0) {
+    Axios.post("http://localhost:8000/api/providers/userupdateprovider", {
+      id: providerInfo.id,
+      parkingLotName,
+      mobileNumber,
+      parkingLotPicture: uploadedFileParkingPicture.filePath,
+    }).then((_res) => {
+      console.log(_res);
+    });
+    history.push("/home");
   };
   const handleToBack = (e) => {
     history.push("/my-parking-space");
@@ -269,4 +268,4 @@ function MyParkingGarageUpdate({ history }) {
   );
 }
 
-export default MyParkingGarageUpdate;
+export default withRouter(MyParkingGarageUpdate);

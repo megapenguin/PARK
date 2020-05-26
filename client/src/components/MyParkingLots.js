@@ -26,9 +26,10 @@ import {
 import logo from "./assets/parklogo.png";
 import Axios from "axios";
 import { ParkingContext } from "../context/ParkingContext";
+import { withRouter } from "react-router-dom";
 
-function MyParkingLots({ history }) {
-  let userData = JSON.parse(localStorage.getItem("userData"));
+function MyParkingLots({ history, Auth }) {
+  //let Auth.state.userData = JSON.parse(localStorage.getIt//em("Auth.state.userData"));
   let [parkingLotLocation, setParkingLotLocation] = useState("");
 
   let [parkingId, setParkingId] = useState({ id: "", userId: "" });
@@ -50,9 +51,8 @@ function MyParkingLots({ history }) {
   };
 
   useEffect(() => {
-    console.log(userData);
     Axios.post(
-      `http://localhost:8000/api/providers/myparkinglots/${userData.id}`,
+      `http://localhost:8000/api/providers/myparkinglots/${Auth.state.userData.id}`,
       {}
     ).then((_res) => {
       console.log(_res);
@@ -90,11 +90,9 @@ function MyParkingLots({ history }) {
     console.log(parkingId);
     setParkingData(parkingId);
     localStorage.setItem("parkingData", JSON.stringify(parkingId));
-
-    //
   };
   const goToGarage = (e) => {
-    if (userData.userStatus === "verified") {
+    if (Auth.state.userData.userStatus === "verified") {
       history.push("/my-parking-space");
     } else {
       setWarning("You are not yet a verified user");
@@ -188,4 +186,4 @@ function MyParkingLots({ history }) {
   );
 }
 
-export default MyParkingLots;
+export default withRouter(MyParkingLots);

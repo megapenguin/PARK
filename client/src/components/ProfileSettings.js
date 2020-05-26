@@ -21,52 +21,51 @@ import {
 } from "reactstrap";
 import logo from "./assets/parklogo.png";
 import Axios from "axios";
+import { withRouter } from "react-router-dom";
 
-function ProfileSettings({ history }) {
-  let userData = JSON.parse(localStorage.getItem("userData"));
+function ProfileSettings({ history, Auth }) {
+  //let Auth.state.userData = JSON.parse(localStorage.getItem("Auth.state.userData"));
 
-  let currentProfile = userData.profilePicture;
-  let frontId = userData.idFront;
-  let backId = userData.idBack;
-  let idWithSelfie = userData.idWithSelfie;
   let [update, setUpdate] = useState("");
   let [refresh, setRefresh] = useState(false);
+  let [currentUser, setCurrentUser] = useState([]);
+  let [currentStatus, setCurrentStatus] = useState([]);
 
   useEffect(() => {
     console.log(refresh);
     Axios.post("http://localhost:8000/api/updates/find", {
-      userId: userData.id,
+      userId: Auth.state.userData.id,
     })
       .then((_res) => {
         console.log(_res);
 
         let data = _res.data;
-        console.log(data);
-        if (data) {
-          console.log("succes");
-          setUpdate(true);
-        } else {
-          console.log("null");
-          setUpdate(false);
-        }
+
+        currentStatus = data;
+        setCurrentStatus(currentStatus);
+        console.log(currentStatus);
       })
       .catch((error) => console.log(error));
   }, [refresh]);
 
-  // useEffect(() => {
-  //   Axios.post("http://localhost:8000/api/updates/insert", {
-  //     userId: userData.id,
-  //     firstName: userData.firstName,
-  //     lastName: userData.lastName,
-  //     contactNumber: userData.contactNumber,
-  //     email: userData.email,
-  //   }).then((_res) => {
-  //     console.log(_res.data);
-  //     let data = _res.data;
-  //     console.log("Success");
-  //   });
-  // }, []);
+  useEffect(() => {
+    Axios.post("http://localhost:8000/api/users/search", {
+      id: Auth.state.userData.id,
+      userName: Auth.state.userData.userName,
+    }).then((_res) => {
+      console.log(_res);
+      let data = _res.data;
+      currentUser = data;
+      setCurrentUser(currentUser);
+      console.log(currentUser);
+      console.log("currentUser");
+    });
+  }, [refresh]);
 
+  let currentProfile = currentUser.profilePicture;
+  let frontId = currentUser.idFront;
+  let backId = currentUser.idBack;
+  let idWithSelfie = currentUser.idWithSelfie;
   console.log(frontId);
   console.log(currentProfile);
 
@@ -92,7 +91,7 @@ function ProfileSettings({ history }) {
                     <FormGroup>
                       <div className="text-center">
                         <h1 style={{ fontWeight: "bold" }}>
-                          {userData.firstName} {userData.lastName}
+                          {currentUser.firstName} {currentUser.lastName}
                         </h1>
                         <CardSubtitle>
                           <img
@@ -109,10 +108,10 @@ function ProfileSettings({ history }) {
 
                         <Label>
                           <h6 style={{ fontWeight: "bold" }}>
-                            User ID : {userData.id}
+                            User ID : {currentUser.id}
                           </h6>
                           <h6 style={{ fontWeight: "bold" }}>
-                            Username : {userData.userName}
+                            Username : {currentUser.userName}
                           </h6>
                           <h6 className="mt-3">
                             <Row>
@@ -123,7 +122,7 @@ function ProfileSettings({ history }) {
                                   fontWeight: "bold",
                                   border: "hidden",
                                 }}
-                                value={userData.firstName}
+                                value={currentUser.firstName}
                               ></input>
                             </Row>
                             <Row>
@@ -133,7 +132,7 @@ function ProfileSettings({ history }) {
                                   fontWeight: "bold",
                                   border: "hidden",
                                 }}
-                                value={userData.lastName}
+                                value={currentUser.lastName}
                               ></input>
                             </Row>
                             <Row>
@@ -143,7 +142,7 @@ function ProfileSettings({ history }) {
                                   fontWeight: "bold",
                                   border: "hidden",
                                 }}
-                                value={userData.contactNumber}
+                                value={currentUser.contactNumber}
                               ></input>
                             </Row>
                             <Row>
@@ -153,17 +152,17 @@ function ProfileSettings({ history }) {
                                   fontWeight: "bold",
                                   border: "hidden",
                                 }}
-                                value={userData.email}
+                                value={currentUser.email}
                               ></input>
                             </Row>
                           </h6>
                           <Row>
-                            {update == true ? (
+                            {currentStatus.status == "Yes" ? (
                               "Update Waiting"
                             ) : (
                               <UpdateRequest
                                 buttonLabel={"Request Update"}
-                                requestInfo={userData}
+                                requestInfo={Auth.state.userData}
                                 value={refresh}
                                 clickValue={setRefresh}
                               />
@@ -225,4 +224,4 @@ function ProfileSettings({ history }) {
   );
 }
 
-export default ProfileSettings;
+export default withRouter(ProfileSettings);
